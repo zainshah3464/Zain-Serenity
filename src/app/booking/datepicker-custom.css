@@ -1,0 +1,45 @@
+/* app/booking/datepicker-custom.css – Light Theme */
+.light-calendar {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  color: #1f2937 !important;
+  font-family: inherit !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+}
+
+.light-calendar .react-datepicker__header {
+  background-color: #f0fdfa !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.light-calendar .react-datepicker__current-month,
+.light-calendar .react-datepicker__day-name {
+  color: #0f172a !important;
+}
+
+.light-calendar .react-datepicker__day {
+  color: #1f2937 !important;
+  border-radius: 50% !important;
+}
+
+.light-calendar .react-datepicker__day:hover {
+  background-color: #ccfbf1 !important;
+  border-radius: 50% !important;
+}
+
+.light-calendar .react-datepicker__day--selected,
+.light-calendar .react-datepicker__day--keyboard-selected {
+  background-color: #0d9488 !important;
+  border-radius: 50% !important;
+  color: white !important;
+}
+
+.light-calendar .react-datepicker__day--disabled {
+  color: #cbd5e1 !important;
+}
+
+.light-calendar .react-datepicker__navigation-icon::before {
+  border-color: #0d9488 !important;
+}
