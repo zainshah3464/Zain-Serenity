@@ -335,42 +335,181 @@ const RevenueChart = ({ data, onRangeChange, currentRange }: any) => {
 
 // ---------- Advanced Loading Animation ----------
 const DashboardLoader = () => (
-  <div className="flex flex-col items-center justify-center py-20">
-    <div className="relative w-24 h-24">
-      <motion.div
-        className="absolute inset-0 rounded-full border-4 border-teal-100"
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute inset-2 rounded-full border-4 border-t-teal-500 border-r-teal-500 border-b-transparent border-l-transparent"
-        animate={{ rotate: -360 }}
-        transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-      >
-        <div className="w-8 h-8 bg-teal-500 rounded-full shadow-lg shadow-teal-200" />
-      </motion.div>
-    </div>
-    <motion.p
-      className="mt-6 text-teal-700 font-semibold text-lg"
-      animate={{ opacity: [0.4, 1, 0.4] }}
-      transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+  <div className="relative flex flex-col items-center justify-center py-20 px-6 select-none">
+    {/* Animated conic gradient border wrapper */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="relative p-[1.5px] rounded-[2rem] overflow-hidden"
     >
-      Loading Dashboard
-      <motion.span
-        animate={{ opacity: [0, 1, 0] }}
-        transition={{ repeat: Infinity, duration: 1.2, times: [0, 0.5, 1] }}
-      >
-        ...
-      </motion.span>
-    </motion.p>
+      {/* Rotating conic gradient border */}
+      <motion.div
+        className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0%,#14b8a6_20%,#22d3ee_40%,#0ea5e9_60%,transparent_80%)]"
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
+      />
+      {/* Inner card - flat white, no glow, no blur, no dot pattern */}
+      <div className="relative bg-white rounded-[calc(2rem-1.5px)] px-10 py-12 flex flex-col items-center overflow-hidden">
+        {/* Loader circle container */}
+        <div className="relative w-28 h-28">
+          {/* Outer conic gradient ring */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,#14b8a6,#22d3ee,#0ea5e9,#14b8a6)]"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+          >
+            <div className="absolute inset-[3px] rounded-full bg-white" />
+          </motion.div>
+
+          {/* Inner rotating gradient ring */}
+          <motion.div
+            className="absolute inset-2 rounded-full border-4 border-transparent border-t-teal-500 border-r-teal-500"
+            animate={{ rotate: -360 }}
+            transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
+          />
+
+          {/* Dashed decorative ring */}
+          <motion.div
+            className="absolute inset-4 rounded-full border-2 border-dashed border-cyan-300/60"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+          />
+
+          {/* Orbiting particles */}
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="absolute top-0 left-1/2 w-2 h-2 -ml-1 rounded-full bg-teal-400"
+              animate={{ rotate: 360 }}
+              transition={{
+                repeat: Infinity,
+                duration: 2 + i * 0.5,
+                ease: "linear",
+                delay: i * 0.3,
+              }}
+              style={{
+                transformOrigin: "50% 56px", // orbit radius
+              }}
+            />
+          ))}
+
+          {/* Core icon */}
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center"
+            animate={{ scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center">
+              <svg
+                className="w-7 h-7 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {/* analytics / bar chart icon */}
+                <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+                <path d="M7 13v3" />
+                <path d="M11 9v7" />
+                <path d="M15 6v10" />
+                <path d="M19 3v13" />
+              </svg>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Floating data pills - left side */}
+        <div className="absolute left-2 top-1/4 hidden md:flex flex-col gap-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="h-2 w-16 rounded-full bg-teal-100"
+              animate={{ scaleX: [1, 0.6, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2 + i * 0.3, ease: "easeInOut", delay: i * 0.2 }}
+            />
+          ))}
+        </div>
+
+        {/* Floating data pills - right side */}
+        <div className="absolute right-2 bottom-1/4 hidden md:flex flex-col gap-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="h-2 w-16 rounded-full bg-cyan-100"
+              animate={{ scaleX: [1, 0.6, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2 + i * 0.3, ease: "easeInOut", delay: i * 0.4 }}
+            />
+          ))}
+        </div>
+
+        {/* Loading text */}
+        <motion.p
+          className="mt-8 text-teal-800 font-semibold text-lg tracking-wide"
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+        >
+          Loading Dashboard
+          <motion.span
+            className="inline-block"
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ repeat: Infinity, duration: 1.2, times: [0, 0.5, 1] }}
+          >
+            ...
+          </motion.span>
+        </motion.p>
+
+        {/* Subtext - simple solid color */}
+        <p className="mt-2 text-xs text-teal-500 uppercase tracking-[0.3em]">
+          Preparing insights
+        </p>
+      </div>
+    </motion.div>
+
+    {/* Bottom progress shimmer bars */}
+    <div className="mt-10 w-64 space-y-3">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="space-y-1">
+          <motion.div
+            className="h-1.5 rounded-full bg-teal-100 overflow-hidden relative"
+            whileHover={{ scale: 1.02 }}
+          >
+            <motion.div
+              className="h-full bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-400 rounded-full relative"
+              initial={{ width: "0%" }}
+              animate={{ width: ["0%", "100%", "0%"] }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.3,
+              }}
+            >
+              {/* Shine effect on bar */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: "linear", delay: i * 0.2 }}
+              />
+            </motion.div>
+          </motion.div>
+          {/* Tiny dots below bars */}
+          <motion.div
+            className="flex gap-1"
+            animate={{ opacity: [0.3, 0.8, 0.3] }}
+            transition={{ repeat: Infinity, duration: 2, delay: i * 0.5 }}
+          >
+            {[0, 1, 2, 3, 4].map((d) => (
+              <span key={d} className="w-1 h-1 rounded-full bg-teal-300/60" />
+            ))}
+          </motion.div>
+        </div>
+      ))}
+    </div>
   </div>
 );
-
 // ---------- Main Dashboard Component ----------
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);

@@ -153,7 +153,7 @@ const storyChapters = [
 ];
 
 /* ────────────────────────────────────
-   Ambient orbs & particles (continuous)
+   Ambient orbs & particles (neutral colors – no green glow)
    ──────────────────────────────────── */
 function AmbientOrbs() {
   const [ready, setReady] = useState(false);
@@ -166,10 +166,7 @@ function AmbientOrbs() {
       top: `${Math.random() * 100}%`,
       duration: 12 + Math.random() * 18,
       delay: Math.random() * 10,
-      color:
-        Math.random() > 0.5
-          ? "bg-teal-400/10"   // back to original
-          : "bg-emerald-400/8", // back to original
+      color: Math.random() > 0.5 ? "bg-gray-200/20" : "bg-gray-300/15", // neutral
     }));
   }, [ready]);
   return (
@@ -205,9 +202,9 @@ function FloatingParticles() {
       {particles.map((p, i) => (
         <motion.div
           key={i}
-          className="absolute rounded-full bg-teal-300/50"  // increased opacity from /30 to /50
+          className="absolute rounded-full bg-gray-400/40" // neutral
           style={{ left: p.left, bottom: "-5%", width: p.size, height: p.size }}
-          animate={{ y: [0, p.yDrift], opacity: [0.8, 0.3], scale: [0.8, 1.6] }} // increased starting opacity
+          animate={{ y: [0, p.yDrift], opacity: [0.6, 0.2], scale: [0.8, 1.6] }}
           transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "linear" }}
         />
       ))}
@@ -353,20 +350,45 @@ function HeroCarousel() {
 }
 
 /* ────────────────────────────────────
-   2) Milestones – modern horizontal scroll + hidden scrollbar + stylish
+   2) Milestones – modern horizontal scroll (mobile no buttons, PC with improved buttons)
    ──────────────────────────────────── */
 function VerticalTimeline() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = containerRef.current;
+    if (el) {
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      setCanScrollLeft(el.scrollLeft > 0);
+      setCanScrollRight(el.scrollLeft < maxScroll - 1);
+    }
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const el = containerRef.current;
+    if (el) {
+      el.addEventListener("scroll", updateScrollState, { passive: true });
+      window.addEventListener("resize", updateScrollState);
+      return () => {
+        el.removeEventListener("scroll", updateScrollState);
+        window.removeEventListener("resize", updateScrollState);
+      };
+    }
+  }, [updateScrollState]);
 
   const scroll = (dir: "left" | "right") => {
     if (containerRef.current) {
       containerRef.current.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
+      // update state after smooth scroll starts, will be updated by scroll event
+      setTimeout(updateScrollState, 400);
     }
   };
 
   return (
     <section className="relative bg-gradient-to-b from-white to-teal-50/30 py-12 md:py-20 overflow-hidden">
-      {/* Hide scrollbar for all browsers */}
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -385,15 +407,15 @@ function VerticalTimeline() {
           </h2>
         </RevealSection>
 
-        {/* Scroll buttons + container */}
         <div className="relative">
           {/* Background line for timeline effect */}
           <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gradient-to-r from-transparent via-teal-200 to-transparent transform -translate-y-1/2 hidden md:block" />
 
-          {/* Left button */}
+          {/* Left button - hidden on mobile, disabled state when can't scroll left */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center bg-white/90 backdrop-blur p-3 rounded-full shadow-lg hover:shadow-xl hover:bg-teal-50 active:scale-90 transition-all duration-200"
+            disabled={!canScrollLeft}
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center bg-white/90 backdrop-blur p-3 rounded-full shadow-lg hover:shadow-xl hover:bg-teal-50 active:scale-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/90 disabled:hover:shadow-lg disabled:active:scale-100"
             aria-label="Scroll left"
           >
             <ChevronLeft className="text-teal-600 w-6 h-6" />
@@ -412,11 +434,9 @@ function VerticalTimeline() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05, duration: 0.4, ease: "easeOut" }}
-                  whileHover={{ y: -4, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
-                  className="relative flex-shrink-0 snap-center w-[220px] md:w-[240px] bg-white/90 backdrop-blur-sm border border-white/80 rounded-2xl p-4 md:p-5 shadow-md group cursor-default transition-all"
+                  whileHover={{ y: -4, scale: 1.03, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+                  className="relative flex-shrink-0 snap-center w-[220px] md:w-[240px] bg-white/90 backdrop-blur-sm border border-white/80 rounded-2xl p-4 md:p-5 shadow-md group cursor-default transition-all duration-300"
                 >
-                  {/* Decorative on timeline */}
-                  
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-teal-200 transition-colors">
                     <Icon className="w-5 h-5 md:w-6 md:h-6 text-teal-700" />
                   </div>
@@ -428,10 +448,11 @@ function VerticalTimeline() {
             })}
           </div>
 
-          {/* Right button */}
+          {/* Right button - hidden on mobile, disabled state when can't scroll right */}
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center bg-white/90 backdrop-blur p-3 rounded-full shadow-lg hover:shadow-xl hover:bg-teal-50 active:scale-90 transition-all duration-200"
+            disabled={!canScrollRight}
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center bg-white/90 backdrop-blur p-3 rounded-full shadow-lg hover:shadow-xl hover:bg-teal-50 active:scale-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/90 disabled:hover:shadow-lg disabled:active:scale-100"
             aria-label="Scroll right"
           >
             <ChevronRight className="text-teal-600 w-6 h-6" />
@@ -558,16 +579,9 @@ function ValuesSection() {
 }
 
 /* ────────────────────────────────────
-   5) Highlights – mobile horizontal, desktop grid
+   5) Highlights – mobile horizontal scroll without buttons, desktop grid with smooth hover
    ──────────────────────────────────── */
 function HighlightsSection() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scroll = (dir: "left" | "right") => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dir === "left" ? -250 : 250, behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="relative bg-gradient-to-b from-white to-teal-50/20 py-16 md:py-24 overflow-hidden">
       <FloatingParticles />
@@ -579,12 +593,14 @@ function HighlightsSection() {
           </h2>
         </RevealSection>
 
-        {/* Mobile horizontal scroll with arrows */}
-        <div className="md:hidden relative">
-          <button onClick={() => scroll("left")} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur p-2 rounded-full shadow-md">
-            <ChevronLeft className="text-teal-600 w-4 h-4" />
-          </button>
-          <div ref={scrollRef} className="flex overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide py-4 px-8">
+        {/* Mobile: horizontal scroll with hint, no buttons */}
+        <div className="md:hidden">
+          <div className="flex items-center justify-center gap-2 mb-4 text-gray-400 text-xs uppercase tracking-wider">
+            <span className="inline-block w-6 h-px bg-gray-300" />
+            Swipe to explore
+            <span className="inline-block w-6 h-px bg-gray-300" />
+          </div>
+          <div className="flex overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide py-4">
             {extraHighlights.map((item, i) => (
               <motion.div
                 key={i}
@@ -600,12 +616,9 @@ function HighlightsSection() {
               </motion.div>
             ))}
           </div>
-          <button onClick={() => scroll("right")} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur p-2 rounded-full shadow-md">
-            <ChevronRight className="text-teal-600 w-4 h-4" />
-          </button>
         </div>
 
-        {/* Desktop grid */}
+        {/* Desktop grid with smooth hover animation */}
         <div className="hidden md:grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {extraHighlights.map((item, i) => (
             <motion.div
@@ -614,8 +627,8 @@ function HighlightsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              whileHover={{ scale: 1.04, rotate: 1, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
-              className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center shadow-sm hover:shadow-xl transition-all border border-white/60 group"
+              whileHover={{ scale: 1.04, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center shadow-sm hover:shadow-xl transition-shadow duration-300 border border-white/60 group"
             >
               <div className="w-14 h-14 mx-auto bg-teal-100 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-teal-200 transition-colors">
                 <item.icon className="w-7 h-7 text-teal-700" />
@@ -630,7 +643,7 @@ function HighlightsSection() {
 }
 
 /* ────────────────────────────────────
-   6) Final Quote – image bg + blobs/particles back
+   6) Final Quote – image bg + blobs/particles back (neutral now)
    ──────────────────────────────────── */
 function FinalQuote() {
   return (
@@ -639,7 +652,6 @@ function FinalQuote() {
         <Image src="/images/about/quote-bg.jpg" alt="Background" fill className="object-cover" />
         <div className="absolute inset-0 bg-white/50 backdrop-blur-sm" />
       </div>
-      {/* Floating blobs/particles – now more visible */}
       <AmbientOrbs />
       <FloatingParticles />
       <RevealSection className="relative z-10 max-w-3xl mx-auto px-4 text-center">

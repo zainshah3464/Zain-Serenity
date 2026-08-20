@@ -15,11 +15,26 @@ import {
   HeartHandshake,
   Star,
   Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
+import { Playfair_Display, Inter, Caveat, Poppins } from "next/font/google";
+
+const playfair = Playfair_Display({ subsets: ["latin"], display: "swap" });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
+const caveat = Caveat({
+  subsets: ["latin"],
+  weight: "700", // handwriting + bold
+  display: "swap",
+});
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 /* ────────────────────────────────────
-   Content phases – story + real details
+   Content phases – same 4 phases
    ──────────────────────────────────── */
 const phases = [
   {
@@ -102,7 +117,7 @@ function AnimatedCounter({
     const controls = animate(0, value, {
       duration: 1.2,
       ease: "easeOut",
-      delay: 0.2,
+      delay: 0.25,
       onUpdate: (latest) => setDisplayValue(Math.round(latest)),
     });
     return () => controls.stop();
@@ -117,65 +132,73 @@ function AnimatedCounter({
 }
 
 /* ────────────────────────────────────
-   Floating decorations (unchanged)
+   Floating decorations – opacity reduced back to original
    ──────────────────────────────────── */
 function FloatingDecorations() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       <motion.div
-        className="absolute top-[10%] left-[5%] w-24 h-24 rounded-full bg-teal-400/10 blur-2xl"
-        animate={{ scale: [1, 1.3, 1], rotate: [0, 20, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[8%] left-[4%] w-20 h-20 md:w-28 md:h-28 rounded-full bg-teal-500/30 blur-3xl"
+        animate={{ scale: [1, 1.4, 1], x: [0, 20, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-[20%] right-[8%] w-32 h-32 rounded-full bg-emerald-300/10 blur-2xl"
-        animate={{ scale: [1, 1.2, 1], rotate: [0, -15, 0] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-[15%] right-[5%] w-24 h-24 md:w-36 md:h-36 rounded-full bg-emerald-400/30 blur-3xl"
+        animate={{ scale: [1, 1.3, 1], y: [0, -20, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute top-[40%] right-[20%] w-16 h-16 rounded-full bg-amber-300/10 blur-xl"
-        animate={{ y: [0, -20, 0], opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 6, repeat: Infinity }}
+        className="absolute top-[40%] right-[20%] w-14 h-14 md:w-20 md:h-20 rounded-full bg-amber-300/30 blur-2xl"
+        animate={{ scale: [1, 1.6, 1], opacity: [0.7, 1, 0.7] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
+
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-teal-400/10 rounded-full"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65%] h-[65%] border border-teal-400/25 rounded-full"
         animate={{ rotate: 360 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       />
       <motion.div
-        className="absolute top-[15%] right-[15%] w-1.5 h-1.5 bg-teal-400 rounded-full"
+        className="absolute top-[18%] right-[12%] w-1.5 h-1.5 bg-teal-500/50 rounded-full"
         animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
-        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+        transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
       />
       <motion.div
-        className="absolute bottom-[30%] left-[12%] w-1.5 h-1.5 bg-emerald-400 rounded-full"
+        className="absolute bottom-[25%] left-[10%] w-2 h-2 bg-emerald-500/50 rounded-full"
         animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity, delay: 1.2 }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
       />
     </div>
   );
 }
 
 /* ────────────────────────────────────
-   New progress bar – sleek, spring‑animated
+   Progress bar – enhanced with glowing dot
    ──────────────────────────────────── */
 function ProgressBar({
   scrollYProgress,
 }: {
   scrollYProgress: MotionValue<number>;
 }) {
-  // Smooth spring for the progress bar
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 20,
+    stiffness: 100,
+    damping: 25,
+    mass: 0.3,
   });
 
+  const dotLeft = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
   return (
-    <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-20 w-[70%] max-w-sm">
-      <div className="h-1.5 bg-white/40 backdrop-blur-sm rounded-full overflow-hidden shadow-inner">
+    <div className="absolute bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-30 w-[80%] max-w-md">
+      <div className="relative h-[4px] bg-gray-200/60 backdrop-blur-sm rounded-full overflow-visible shadow-inner">
         <motion.div
-          className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full origin-left"
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-teal-600 to-emerald-500 rounded-full origin-left shadow-[0_0_10px_rgba(20,184,166,0.5)]"
           style={{ scaleX }}
+        />
+        {/* Glowing dot at leading edge */}
+        <motion.div
+          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-teal-600 shadow-[0_0_12px_rgba(20,184,166,0.8)] z-10"
+          style={{ left: dotLeft }}
         />
       </div>
     </div>
@@ -183,39 +206,64 @@ function ProgressBar({
 }
 
 /* ────────────────────────────────────
-   Parallax Background (unchanged)
+   Phase Indicators – responsive modern nav
    ──────────────────────────────────── */
-function ParallaxBackground({
-  image,
-  phaseProgress,
+function PhaseIndicators({
+  active,
+  total,
+  onSelect,
 }: {
-  image: string;
-  phaseProgress: MotionValue<number>;
+  active: number;
+  total: number;
+  onSelect: (idx: number) => void;
 }) {
-  const y = useTransform(phaseProgress, [0, 1], ["0%", "-5%"]);
-
   return (
-    <motion.div
-      className="absolute inset-0 z-0"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.25 }}
-      exit={{ opacity: 0 }}
-      style={{ y }}
-    >
-      <Image
-        src={image}
-        alt=""
-        fill
-        className="object-cover transition-all duration-1000"
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-row items-center gap-2 md:right-8 md:top-1/2 md:bottom-auto md:left-auto md:translate-x-0 md:-translate-y-1/2 md:flex-col md:gap-0">
+      {/* Vertical line only on md+ */}
+      <div className="hidden md:block absolute top-0 bottom-0 w-[2px] bg-gradient-to-b from-teal-100 via-gray-200 to-teal-100" />
+      {/* Active fill line only on md+ */}
+      <motion.div
+        className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 w-[2px] bg-gradient-to-b from-teal-500 to-emerald-500"
+        style={{ height: `${((active + 0.5) / total) * 100}%` }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/60 to-white/90" />
-      <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-transparent to-white/30" />
-    </motion.div>
+
+      {Array.from({ length: total }).map((_, idx) => (
+        <button
+          key={idx}
+          onClick={() => onSelect(idx)}
+          aria-label={`Go to phase ${idx + 1}`}
+          className="relative z-10 flex items-center justify-center mx-1 md:mx-0 md:my-2 lg:my-3 w-8 h-8 md:w-10 md:h-10 rounded-full transition-all duration-300 group"
+        >
+          <span
+            className={`absolute inset-0 rounded-full transition-all duration-300 ${
+              idx === active
+                ? "bg-gradient-to-br from-teal-500 to-emerald-500 border border-teal-400 shadow-xl shadow-teal-500/40 scale-110"
+                : "bg-white/90 border border-gray-200/80 hover:border-teal-300 hover:bg-teal-50 hover:scale-105 shadow-sm"
+            }`}
+          />
+          <span
+            className={`relative z-10 text-[10px] md:text-xs font-semibold transition-colors duration-300 ${
+              idx === active ? "text-white" : "text-gray-500 group-hover:text-teal-600"
+            }`}
+          >
+            {String(idx + 1).padStart(2, "0")}
+          </span>
+          {idx === active && (
+            <motion.span
+              className="absolute -right-1 -top-1 w-2 h-2 bg-amber-400 rounded-full"
+              layoutId="activeDot"
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            />
+          )}
+        </button>
+      ))}
+    </div>
   );
 }
 
 /* ────────────────────────────────────
-   Main Why Choose Us
+   Main Why Choose Us – background images removed
    ──────────────────────────────────── */
 export default function WhyChooseUs() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -226,10 +274,10 @@ export default function WhyChooseUs() {
     offset: ["start start", "end end"],
   });
 
-  // Smooth spring for overall scroll progress
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 100,
-    damping: 20,
+    damping: 22,
+    mass: 0.4,
   });
 
   useEffect(() => {
@@ -241,7 +289,6 @@ export default function WhyChooseUs() {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // Local progress within the active phase (0→1)
   const phaseLocalProgress = useTransform(
     smoothProgress,
     [activePhase / phases.length, (activePhase + 1) / phases.length],
@@ -251,6 +298,13 @@ export default function WhyChooseUs() {
   const currentPhase = phases[activePhase];
   const IconComponent = currentPhase.icon;
 
+  const goToPhase = (idx: number) => {
+    if (sectionRef.current) {
+      const targetY = (idx / phases.length) * sectionRef.current.offsetHeight;
+      window.scrollTo({ top: sectionRef.current.offsetTop + targetY, behavior: "smooth" });
+    }
+  };
+
   return (
     <section
       id="why-choose-us"
@@ -258,99 +312,98 @@ export default function WhyChooseUs() {
       className="relative"
       style={{ height: `${phases.length * 100}vh` }}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-gradient-to-b from-[#FAFAFA] via-teal-50/30 to-white">
-        {/* Parallax background */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activePhase}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="absolute inset-0 z-0"
-          >
-            <ParallaxBackground
-              image={currentPhase.image}
-              phaseProgress={phaseLocalProgress}
-            />
-          </motion.div>
-        </AnimatePresence>
-
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-gradient-to-br from-white via-teal-50/40 to-white">
         <FloatingDecorations />
 
-        {/* Main content - mobile spacing reduced */}
-        <div className="relative z-10 h-full flex flex-col justify-center px-4 sm:px-6 md:px-16 lg:px-24">
-          <div className="max-w-5xl mx-auto w-full">
+        <PhaseIndicators
+          active={activePhase}
+          total={phases.length}
+          onSelect={goToPhase}
+        />
+
+        {/* Main content */}
+        <div className="relative z-10 h-full flex items-center px-4 sm:px-6 md:px-16 lg:px-24">
+          <div className="max-w-6xl mx-auto w-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activePhase}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{
                   type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  mass: 0.5,
+                  stiffness: 90,
+                  damping: 18,
+                  mass: 0.4,
                 }}
-                className="grid md:grid-cols-2 gap-5 sm:gap-8 md:gap-10 items-center"
+                className="grid md:grid-cols-2 gap-6 md:gap-14 items-center"
               >
-                {/* Text column */}
-                <div className="order-2 md:order-1">
+                {/* ─── Text Column ─── */}
+                <div className="order-2 md:order-1 relative">
+                  {/* Ghost number */}
+                  <div
+                    className={`${playfair.className} absolute -top-10 -left-2 md:-top-16 md:-left-6 text-5xl md:text-8xl lg:text-9xl font-bold text-teal-900/5 select-none leading-none pointer-events-none`}
+                  >
+                    0{activePhase + 1}
+                  </div>
+
                   <motion.div
-                    className="inline-flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 bg-white/50 backdrop-blur-sm rounded-full px-3 py-0.5 sm:px-4 sm:py-1 border border-teal-200/30 shadow-sm"
-                    whileHover={{ scale: 1.02 }}
+                    className="inline-flex items-center gap-2 mb-3 md:mb-5 bg-white/60 backdrop-blur-md rounded-full px-3 py-1 md:px-4 md:py-1.5 border border-teal-100/70 shadow-sm"
+                    whileHover={{ scale: 1.03 }}
                   >
                     <motion.span
-                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center"
-                      whileHover={{ rotate: 15, scale: 1.1 }}
+                      className="w-6 h-6 md:w-8 md:h-8 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 text-white flex items-center justify-center shadow-md"
+                      whileHover={{ rotate: 12, scale: 1.1 }}
                     >
-                      <IconComponent size={16} className="sm:w-[18px] sm:h-[18px]" />
+                      <IconComponent size={14} className="md:w-[18px] md:h-[18px]" />
                     </motion.span>
-                    <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-teal-700 font-semibold">
+                    <span className={`${inter.className} text-[9px] md:text-xs uppercase tracking-[0.3em] text-teal-800 font-semibold`}>
                       {currentPhase.subtitle}
                     </span>
                   </motion.div>
 
+                  {/* Heading font changed to Caveat (handwriting + bold) */}
                   <motion.h2
-                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-['Playfair_Display',serif] font-extrabold text-gray-800 leading-tight mb-3 sm:mb-5 drop-shadow-sm"
-                    initial={{ opacity: 0, x: -20 }}
+                    className={`${caveat.className} text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-3 md:mb-5 tracking-wide`}
+                    initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 120, damping: 18 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 100, damping: 18 }}
                   >
                     {currentPhase.title}
                   </motion.h2>
 
                   <motion.p
-                    className="text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed mb-4 sm:mb-6 md:mb-8 max-w-xl"
+                    className={`${inter.className} text-xs sm:text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed mb-4 md:mb-8 max-w-xl`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.5 }}
+                    transition={{ delay: 0.35, duration: 0.6 }}
                   >
                     {currentPhase.description}
                   </motion.p>
 
+                  {/* Stats grid */}
                   <motion.div
-                    className="flex gap-5 sm:gap-8 flex-wrap"
+                    className="flex gap-2 md:gap-5 flex-wrap"
                     initial="hidden"
                     animate="visible"
                     variants={{
-                      visible: { transition: { staggerChildren: 0.15 } },
+                      visible: { transition: { staggerChildren: 0.18 } },
                     }}
                   >
                     {currentPhase.stats.map((stat, i) => (
                       <motion.div
                         key={i}
                         variants={{
-                          hidden: { opacity: 0, y: 20 },
-                          visible: { opacity: 1, y: 0 },
+                          hidden: { opacity: 0, y: 25, scale: 0.95 },
+                          visible: { opacity: 1, y: 0, scale: 1 },
                         }}
-                        className="text-center"
+                        whileHover={{ y: -4, boxShadow: "0 12px 25px rgba(0,0,0,0.08)" }}
+                        className="bg-white/70 backdrop-blur-md border border-white/80 shadow-sm rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-5 flex flex-col items-center min-w-[80px] md:min-w-[110px]"
                       >
-                        <span className="block text-2xl sm:text-3xl md:text-4xl font-bold text-teal-600">
+                        <span className={`${playfair.className} text-xl md:text-3xl font-bold text-teal-700`}>
                           <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                         </span>
-                        <span className="text-[10px] sm:text-xs uppercase tracking-wider text-gray-500">
+                        <span className={`${inter.className} text-[8px] md:text-[11px] uppercase tracking-wider text-gray-500 mt-0.5 md:mt-1`}>
                           {stat.label}
                         </span>
                       </motion.div>
@@ -358,14 +411,14 @@ export default function WhyChooseUs() {
                   </motion.div>
                 </div>
 
-                {/* Image column */}
+                {/* ─── Image Column ─── */}
                 <motion.div
                   className="order-1 md:order-2 relative"
-                  animate={{ y: [0, -6, 0] }}
+                  animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 >
                   <motion.div
-                    className="relative w-full aspect-[3/4] sm:aspect-[4/5] max-w-[75vw] sm:max-w-sm mx-auto rounded-3xl overflow-hidden shadow-2xl border border-white/50 group"
+                    className="relative w-full aspect-[4/3] sm:aspect-[4/5] max-w-[55vw] sm:max-w-[60vw] md:max-w-md mx-auto rounded-xl md:rounded-[2rem] overflow-hidden shadow-2xl border border-white/60 group"
                     whileHover={{ scale: 1.02, rotate: -0.5 }}
                     transition={{ type: "spring", stiffness: 200, damping: 15 }}
                   >
@@ -373,33 +426,38 @@ export default function WhyChooseUs() {
                       src={currentPhase.image}
                       alt={currentPhase.title}
                       fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-white/60 backdrop-blur-md p-2 sm:p-4 text-xs sm:text-sm text-gray-700">
-                      <span className="font-semibold">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2 md:bottom-4 md:left-4 md:right-4 flex items-center justify-between pointer-events-none">
+                      <span className={`${inter.className} text-[10px] md:text-sm font-semibold text-white drop-shadow-lg`}>
                         {currentPhase.subtitle}
-                      </span>{" "}
-                      —{" "}
-                      {currentPhase.stats
-                        .map((s) => `${s.value}${s.suffix}`)
-                        .join(" / ")}
+                      </span>
+                      <span className="text-white drop-shadow-lg">
+                        <ArrowUpRight size={14} className="md:w-[18px] md:h-[18px]" />
+                      </span>
                     </div>
                   </motion.div>
 
                   <motion.div
-                    className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-2xl shadow-lg flex items-center justify-center text-teal-500"
-                    animate={{ y: [0, -6, 0], rotate: [0, 10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -top-2 -right-1 md:-top-5 md:-right-4 w-8 h-8 md:w-14 md:h-14 bg-white rounded-lg md:rounded-2xl shadow-lg flex items-center justify-center text-teal-600 border border-teal-100"
+                    animate={{ y: [0, -8, 0], rotate: [0, 10, 0] }}
+                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    <Sparkles size={16} className="sm:w-5 sm:h-5" />
+                    <Sparkles size={16} className="md:w-6 md:h-6" />
                   </motion.div>
+
+                  <motion.div
+                    className="absolute -bottom-2 -left-2 md:-bottom-8 md:-left-8 w-20 h-20 md:w-40 md:h-40 rounded-full border-2 border-dashed border-teal-300/40"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                  />
                 </motion.div>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
-        {/* New progress bar */}
         <ProgressBar scrollYProgress={smoothProgress} />
       </div>
     </section>

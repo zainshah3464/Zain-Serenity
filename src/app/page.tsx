@@ -8,6 +8,8 @@ import ReviewCarousel from "@/components/ReviewCarousel";
 import Gallery from "@/components/Gallery";
 import LocationMap from "@/components/LocationMap";
 import StoryHero from "@/components/StoryHero";
+import FeaturedRoomsCarousel from "@/components/FeaturedRoomsCarousel";
+
 interface RoomData {
   _id: string;
   name: string;
@@ -26,7 +28,7 @@ export default async function HomePage() {
       status: "active",
       isFeatured: true,
     })
-      .limit(3)
+      .sort({ createdAt: -1 }) // optional, latest first
       .lean();
 
     rooms = rawRooms.map((room: any) => ({
@@ -44,29 +46,24 @@ export default async function HomePage() {
 
   return (
     <div className="bg-[#FAFAFA]">
-      <StoryHero/>
+      <StoryHero />
 
       <WhyChooseUs />
 
-
+      {/* Featured Rooms Section */}
       <section className="py-16 max-w-7xl mx-auto px-4">
         <ScrollReveal>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-center text-gray-800 mb-12">
-            Our Featured Rooms
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {rooms.length > 0 ? (
-              rooms.map((room) => <RoomCard key={room._id} room={room} />)
-            ) : (
-              <p className="col-span-3 text-center text-gray-500">
-                No featured rooms available right now.
-              </p>
-            )}
-          </div>
+          {rooms.length > 0 ? (
+            <FeaturedRoomsCarousel rooms={rooms} />
+          ) : (
+            <p className="text-center text-gray-500">
+              No featured rooms available right now.
+            </p>
+          )}
         </ScrollReveal>
       </section>
 
-            <Gallery />  {/* new */}
+      <Gallery />
 
       <section className="py-16 bg-white/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4">
@@ -76,7 +73,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <LocationMap />   {/* new */}
+      <LocationMap />
     </div>
   );
 }

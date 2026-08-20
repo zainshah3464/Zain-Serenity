@@ -30,16 +30,16 @@ export default function SearchBar() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.6 }}
-      // Fully transparent, only border visible
-      className="relative flex flex-col sm:flex-row gap-3 
-                 bg-transparent border border-white/40 rounded-3xl p-4"
+      // Always row layout — mobile one line
+      className="relative flex flex-row items-stretch gap-2 sm:gap-3 
+                 bg-transparent border border-white/40 rounded-2xl p-2.5 sm:p-4"
     >
       {/* Check-in */}
-      <div className="flex-1 relative group w-full">
-        <label className="absolute -top-3 left-4 text-white/90 text-[10px] font-semibold uppercase tracking-wider z-10">
+      <div className="flex-1 relative min-w-0">
+        <label className="absolute -top-2.5 left-3 sm:left-4 text-white/90 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider z-10">
           Check‑in
         </label>
-        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 w-5 h-5 pointer-events-none" />
+        <Calendar className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-white/70 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
         <DatePicker
           selected={checkIn}
           onChange={(date: Date | null) => {
@@ -53,7 +53,7 @@ export default function SearchBar() {
           endDate={checkOut}
           placeholderText="Add date"
           className="w-full bg-transparent text-white placeholder-white/40
-                     pl-10 pr-8 py-3.5 
+                     pl-8 sm:pl-10 pr-7 sm:pr-8 py-2.5 sm:py-3.5 text-sm sm:text-base
                      border-b border-white/30 focus:outline-none focus:border-b-teal-400
                      cursor-pointer transition-all duration-300"
           dateFormat="dd MMM yyyy"
@@ -65,19 +65,19 @@ export default function SearchBar() {
           <button
             type="button"
             onClick={() => setCheckIn(null)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/90 p-1 transition-colors"
+            className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/90 p-1 transition-colors"
           >
-            <X size={16} />
+            <X size={14} className="sm:w-4 sm:h-4" />
           </button>
         )}
       </div>
 
       {/* Check-out */}
-      <div className="flex-1 relative group w-full">
-        <label className="absolute -top-3 left-4 text-white/90 text-[10px] font-semibold uppercase tracking-wider z-10">
+      <div className="flex-1 relative min-w-0">
+        <label className="absolute -top-2.5 left-3 sm:left-4 text-white/90 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider z-10">
           Check‑out
         </label>
-        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 w-5 h-5 pointer-events-none" />
+        <Calendar className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-white/70 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
         <DatePicker
           selected={checkOut}
           onChange={(date: Date | null) => {
@@ -92,7 +92,7 @@ export default function SearchBar() {
           minDate={checkIn || new Date()}
           placeholderText="Add date"
           className="w-full bg-transparent text-white placeholder-white/40
-                     pl-10 pr-8 py-3.5 
+                     pl-8 sm:pl-10 pr-7 sm:pr-8 py-2.5 sm:py-3.5 text-sm sm:text-base
                      border-b border-white/30 focus:outline-none focus:border-b-teal-400
                      cursor-pointer transition-all duration-300"
           dateFormat="dd MMM yyyy"
@@ -102,24 +102,27 @@ export default function SearchBar() {
           <button
             type="button"
             onClick={() => setCheckOut(null)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/90 p-1 transition-colors"
+            className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/90 p-1 transition-colors"
           >
-            <X size={16} />
+            <X size={14} className="sm:w-4 sm:h-4" />
           </button>
         )}
       </div>
 
-      {/* Search Button – solid gradient, no transparency, clean */}
+      {/* Search Button — icon only on mobile, text + icon on sm+ */}
       <motion.button
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         type="submit"
-        className="bg-gradient-to-r from-teal-500 to-emerald-500 
-                   text-white px-6 py-3.5 rounded-xl font-semibold 
+        aria-label="Search"
+        className="shrink-0 bg-gradient-to-r from-teal-500 to-emerald-500 
+                   text-white rounded-xl font-semibold 
                    flex items-center justify-center gap-2 
-                   transition-all hover:from-teal-600 hover:to-emerald-600"
+                   transition-all hover:from-teal-600 hover:to-emerald-600
+                   px-3 py-2.5 sm:px-6 sm:py-3.5"
       >
-        <Search size={20} /> Search
+        <Search size={18} className="sm:w-5 sm:h-5" />
+        <span className="hidden sm:inline">Search</span>
       </motion.button>
 
       {/* Clear Dates – small, absolute top-right */}
@@ -127,7 +130,7 @@ export default function SearchBar() {
         <button
           type="button"
           onClick={clearDates}
-          className="absolute -top-5 right-0 text-xs text-teal-400/80 hover:text-teal-300 underline underline-offset-2"
+          className="absolute -top-5 right-0 text-[10px] sm:text-xs text-teal-400/80 hover:text-teal-300 underline underline-offset-2"
         >
           Clear dates
         </button>

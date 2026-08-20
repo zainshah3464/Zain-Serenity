@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -26,15 +26,31 @@ const galleryImages = [
 ];
 
 /* ────────────────────────────────────
-   Responsive aspect ratios – MOBILE NOW HAS VARIED HEIGHTS
+   Bento/Mosaic grid spans — Mobile base, Desktop md overrides
    ──────────────────────────────────── */
-const getAspectClasses = (index: number) => {
-  // Mobile: varied heights (3/4 tall, 1/1 square, 4/3 landscape)
-  // Desktop: original varied mix
-  if (index % 3 === 0) return "aspect-[3/4] md:aspect-[3/4]";       // tall
-  if (index % 2 === 0) return "aspect-[1/1] md:aspect-[4/5]";       // square
-  return "aspect-[4/3] md:aspect-[4/3]";                            // landscape
-};
+const spanClassesBase = [
+  "col-span-2 row-span-2", // 0: Large feature
+  "col-span-1 row-span-1", // 1
+  "col-span-1 row-span-1", // 2
+  "col-span-1 row-span-2", // 3: Tall (mobile)
+  "col-span-1 row-span-1", // 4
+  "col-span-1 row-span-1", // 5
+  "col-span-2 row-span-1", // 6: Wide (mobile)
+  "col-span-1 row-span-1", // 7
+  "col-span-1 row-span-1", // 8
+];
+
+const spanClassesMd = [
+  "md:col-span-2 md:row-span-2", // 0: Large feature
+  "md:col-span-1 md:row-span-1", // 1
+  "md:col-span-1 md:row-span-1", // 2
+  "md:col-span-2 md:row-span-1", // 3: Wide (desktop)
+  "md:col-span-1 md:row-span-2", // 4: Tall (desktop)
+  "md:col-span-2 md:row-span-1", // 5: Wide (desktop)
+  "md:col-span-1 md:row-span-1", // 6: Normal
+  "md:col-span-2 md:row-span-1", // 7: Wide (desktop)
+  "md:col-span-1 md:row-span-1", // 8: Normal
+];
 
 /* ────────────────────────────────────
    Floating decoration
@@ -57,68 +73,7 @@ function FloatingDecorations() {
 }
 
 /* ────────────────────────────────────
-   Gallery card (optimised)
-   ──────────────────────────────────── */
-function GalleryCard({
-  image,
-  index,
-  onClick,
-}: {
-  image: (typeof galleryImages)[0];
-  index: number;
-  onClick: () => void;
-}) {
-  const aspectClasses = getAspectClasses(index);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-30px" }}
-      transition={{
-        delay: index * 0.06,
-        type: "spring",
-        stiffness: 120,
-        damping: 18,
-        mass: 0.8,
-      }}
-      whileHover={{ scale: 1.02, rotate: -0.3 }}
-      className={`group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg md:shadow-xl hover:shadow-2xl transition-shadow cursor-pointer ${aspectClasses}`}
-      onClick={onClick}
-    >
-      {/* image */}
-      <motion.div
-        className="w-full h-full"
-        whileHover={{ scale: 1.08 }}
-        transition={{ type: "spring", stiffness: 150, damping: 12 }}
-      >
-        <Image
-          src={image.src}
-          alt={image.alt}
-          fill
-          sizes="(max-width: 1023px) 50vw, 33vw"
-          className="object-cover"
-        />
-      </motion.div>
-
-      {/* overlay caption */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 md:p-4">
-        <p className="text-white text-xs md:text-sm font-medium leading-tight">
-          {image.alt}
-        </p>
-      </div>
-
-      {/* shine */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ backgroundSize: "200% 200%", backgroundPosition: "100% 100%" }}
-      />
-    </motion.div>
-  );
-}
-
-/* ────────────────────────────────────
-   Lightbox (unchanged, slightly smaller)
+   Lightbox (unchanged)
    ──────────────────────────────────── */
 function ImageLightbox({
   images,
@@ -258,7 +213,7 @@ export default function Gallery() {
       >
         <FloatingDecorations />
 
-        <motion.div style={{ opacity }} className="relative z-10 max-w-7xl mx-auto px-3 md:px-4">
+        <motion.div style={{ opacity }} className="relative z-10 max-w-6xl mx-auto px-3 md:px-4">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -278,16 +233,45 @@ export default function Gallery() {
             A visual journey through Zain's Serenity — where every corner tells a story.
           </motion.p>
 
-          {/* Masonry grid – 2 columns on mobile, 3 on lg */}
-          <div className="columns-2 lg:columns-3 gap-2 md:gap-4 space-y-2 md:space-y-4">
+          {/* Bento / Mosaic Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[150px] md:auto-rows-[200px] gap-2 md:gap-4 grid-flow-dense">
             {galleryImages.map((image, idx) => (
-              <div key={idx} className="break-inside-avoid">
-                <GalleryCard
-                  image={image}
-                  index={idx}
-                  onClick={() => openLightbox(idx)}
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ delay: idx * 0.05, type: "spring", stiffness: 120, damping: 18 }}
+                className={`${spanClassesBase[idx]} ${spanClassesMd[idx]} group relative overflow-hidden rounded-2xl md:rounded-3xl shadow-lg md:shadow-xl hover:shadow-2xl transition-shadow cursor-pointer`}
+                onClick={() => openLightbox(idx)}
+              >
+                <motion.div
+                  className="w-full h-full"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 150, damping: 12 }}
+                >
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover"
+                  />
+                </motion.div>
+
+                {/* overlay caption */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2 md:p-4">
+                  <p className="text-white text-[10px] md:text-sm font-medium leading-tight">
+                    {image.alt}
+                  </p>
+                </div>
+
+                {/* shine */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ backgroundSize: "200% 200%", backgroundPosition: "100% 100%" }}
                 />
-              </div>
+              </motion.div>
             ))}
           </div>
 

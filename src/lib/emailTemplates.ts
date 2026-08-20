@@ -29,6 +29,7 @@ export function getEmailWrapper(title: string, content: string): string {
           border-radius: 24px;
           overflow: hidden;
           box-shadow: 0 20px 40px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03);
+          width: 100%;
         }
 
         .email-header {
@@ -145,6 +146,7 @@ export function getEmailWrapper(title: string, content: string): string {
           color: #ffffff !important;
         }
 
+        /* ---------- Old Simple Footer (Dark) ---------- */
         .email-footer {
           background-color: #1e293b;
           padding: 36px 40px;
@@ -168,36 +170,88 @@ export function getEmailWrapper(title: string, content: string): string {
           color: #64748b;
           margin-top: 20px;
         }
+        /* ---------- End Old Footer ---------- */
 
         @media only screen and (max-width: 600px) {
           .email-wrapper {
             margin: 12px auto;
             border-radius: 18px;
+            width: 100%;
           }
           .email-header {
-            padding: 40px 24px 36px;
+            padding: 32px 20px 28px;
           }
           .email-header h1 {
-            font-size: 32px;
+            font-size: 28px;
           }
           .email-header p {
-            font-size: 15px;
+            font-size: 13px;
           }
           .email-body {
-            padding: 36px 24px;
+            padding: 28px 20px;
           }
           .email-body h2 {
-            font-size: 24px;
+            font-size: 22px;
           }
           .email-body p {
-            font-size: 16px;
+            font-size: 15px;
+            line-height: 1.6;
           }
           .email-button {
-            padding: 14px 32px;
-            font-size: 16px;
+            padding: 12px 24px;
+            font-size: 15px;
+            display: block;
+            width: auto;
+            max-width: 100%;
+            margin: 12px auto 20px;
+            text-align: center;
+          }
+          .email-button-outline {
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 6px 4px 16px 0;
+          }
+          .highlight-box {
+            padding: 16px 16px;
+          }
+          .divider {
+            margin: 24px 0 20px;
           }
           .email-footer {
-            padding: 28px 24px;
+            padding: 28px 20px;
+          }
+          .email-footer p {
+            font-size: 12px;
+          }
+          .footer-copyright {
+            font-size: 11px;
+            margin-top: 14px;
+          }
+        }
+
+        @media only screen and (max-width: 400px) {
+          .email-header h1 {
+            font-size: 24px;
+          }
+          .email-header p {
+            font-size: 12px;
+          }
+          .email-body h2 {
+            font-size: 20px;
+          }
+          .email-body p {
+            font-size: 14px;
+          }
+          .email-button {
+            font-size: 14px;
+            padding: 10px 20px;
+          }
+          .email-button-outline {
+            font-size: 13px;
+            padding: 8px 16px;
+          }
+          .email-footer {
+            padding: 24px 16px;
           }
         }
       </style>
@@ -253,7 +307,7 @@ export function styledDivider(): string {
   return `<div class="divider"></div>`;
 }
 
-// ✅ New: Welcome email for newly created/verified accounts
+// ✅ Welcome email for newly created/verified accounts
 export function welcomeNewAccountEmail(name: string, loginUrl: string) {
   return getEmailWrapper(
     "Your Account is Ready!",
@@ -268,7 +322,7 @@ export function welcomeNewAccountEmail(name: string, loginUrl: string) {
   );
 }
 
-// ✅ New: Welcome back email for returning logins
+// ✅ Welcome back email for returning logins
 export function welcomeBackEmail(name: string, loginUrl: string) {
   return getEmailWrapper(
     "Welcome Back!",

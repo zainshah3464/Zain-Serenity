@@ -2,10 +2,11 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import PublicLayoutWrapper from "@/components/PublicLayoutWrapper";
+import { HeroLoadingProvider } from "@/components/HeroLoadingContext"; // ← Import added
 
 // ─── Professional Metadata ───────────────────────────────
 export const metadata: Metadata = {
-  metadataBase: new URL("https://serenity.vercel.app"),
+  metadataBase: new URL("https://zainserenity.vercel.app"),
   title: {
     default: "Zain's Serenity | Luxury Coastal Retreat in Crystal Cove",
     template: "%s | Zain's Serenity",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://serenity.vercel.app",
+    url: "https://zainserenity.vercel.app",
     siteName: "Zain's Serenity",
     title: "Zain's Serenity | Luxury Coastal Retreat",
     description:
@@ -102,9 +103,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-gradient-to-b from-white via-green-50/10 to-gray-50 text-gray-800 antialiased">
-        <Providers>
-          <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
-        </Providers>
+        <HeroLoadingProvider>
+          <Providers>
+            <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
+          </Providers>
+        </HeroLoadingProvider>
       </body>
     </html>
   );
