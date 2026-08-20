@@ -138,39 +138,6 @@ const scenes: Scene[] = [
 /* ────────────────────────────────────
    Decorative rings & floating dots
    ──────────────────────────────────── */
-const DecorativeElements = memo(function DecorativeElements() {
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] max-w-none aspect-square rounded-full border border-teal-400/20"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] max-w-none aspect-square rounded-full border border-emerald-400/20"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute top-[20%] left-[15%] w-2 h-2 bg-teal-400 rounded-full"
-        animate={{ scale: [1, 1.8, 1], opacity: [0.4, 0.9, 0.4] }}
-        transition={{ duration: 4, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute bottom-[25%] right-[10%] w-3 h-3 bg-emerald-400 rounded-full"
-        animate={{ scale: [1, 2, 1], opacity: [0.3, 0.8, 0.3] }}
-        transition={{ duration: 5, repeat: Infinity, delay: 1.2 }}
-      />
-      <motion.div
-        className="absolute top-[40%] right-[20%] w-1.5 h-1.5 bg-amber-300 rounded-full"
-        animate={{ scale: [1, 2.2, 1], opacity: [0.3, 1, 0.3] }}
-        transition={{ duration: 6, repeat: Infinity, delay: 2 }}
-      />
-    </div>
-  );
-});
-
-
 
 
 
@@ -633,7 +600,6 @@ export default function StoryHero() {
 
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-10" />
 
-        <DecorativeElements />
 
         <AnimatePresence>
           {videoStatus === "loading" && (

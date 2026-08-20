@@ -10,6 +10,13 @@ import LocationMap from "@/components/LocationMap";
 import StoryHero from "@/components/StoryHero";
 import FeaturedRoomsCarousel from "@/components/FeaturedRoomsCarousel";
 
+// ✅ Force dynamic rendering so the page is not statically generated
+export const dynamic = "force-dynamic";
+
+
+
+
+
 interface RoomData {
   _id: string;
   name: string;
