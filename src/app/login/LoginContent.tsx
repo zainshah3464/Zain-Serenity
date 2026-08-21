@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { trackEvent } from "@/lib/ga4"; // ← GA4 tracking import
 
 export default function LoginContent() {
   const router = useRouter();
@@ -40,14 +39,15 @@ export default function LoginContent() {
       setError(result.error);
       setTimeout(() => setError(""), 5000);
     } else if (result?.ok) {
-      // GA4: login event for credentials
-      trackEvent('login', { method: 'credentials' });
+      // Store login method for UserIDTracker
+      localStorage.setItem('loginMethod', 'credentials');
+      // No direct tracking here; Providers.tsx will fire login event with user_id
     }
   };
 
-  // Google sign-in with tracking
+  // Google sign-in: store method before redirect
   const handleGoogleSignIn = () => {
-    trackEvent('login', { method: 'google' });
+    localStorage.setItem('loginMethod', 'google');
     signIn("google", { callbackUrl: "/" });
   };
 

@@ -1,30 +1,36 @@
 "use client";
 import { SessionProvider, useSession } from "next-auth/react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 function UserIDTracker() {
   const { data: session, status } = useSession();
-  const prevStatus = useRef(status);
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.id) {
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        // user_id set karo
-        (window as any).gtag('set', 'user_id', session.user.id);
-        // config update karo (future events ke liye)
-        (window as any).gtag('config', process.env.NEXT_PUBLIC_GA_ID, {
+    if (status === 'authenticated' && session?.user?.id && typeof window !== 'undefined' && (window as any).gtag) {
+      const gtag = (window as any).gtag;
+      
+      // 1. Set user_id
+      gtag('set', 'user_id', session.user.id);
+      
+      // 2. Update config
+      gtag('config', process.env.NEXT_PUBLIC_GA_ID, {
+        user_id: session.user.id,
+      });
+
+      // 3. Fire login event if loginMethod exists in localStorage
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (loginMethod) {
+        gtag('event', 'login', {
+          method: loginMethod,
           user_id: session.user.id,
         });
-
-        // agar pehle authenticated nahi tha, to login event fire karo
-        if (prevStatus.current !== 'authenticated') {
-          (window as any).gtag('event', 'login', {
-            method: 'credentials', // ya 'google' depending
-          });
-        }
+        // Remove stored method to avoid duplicate events on page refresh
+        localStorage.removeItem('loginMethod');
       }
+
+      // Debugging (optional)
+      console.log('✅ GA4 user_id set:', session.user.id);
     }
-    prevStatus.current = status;
   }, [status, session]);
 
   return null;
