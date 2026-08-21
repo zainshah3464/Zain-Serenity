@@ -99,21 +99,21 @@ function BookedCalendar({ bookings }: { bookings: BookingData[] }) {
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 shadow-lg h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="text-teal-600 hover:text-teal-800 p-1.5 rounded-full hover:bg-teal-50 transition">
-          <ChevronLeft size={20} />
+    <div className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-4 sm:p-6 shadow-lg h-full flex flex-col">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <button onClick={prevMonth} className="text-teal-600 hover:text-teal-800 p-1 sm:p-1.5 rounded-full hover:bg-teal-50 transition">
+          <ChevronLeft size={18} className="sm:size-20" />
         </button>
-        <h4 className="text-lg font-bold text-gray-800">
+        <h4 className="text-base sm:text-lg font-bold text-gray-800">
           {viewDate.toLocaleString("default", { month: "long", year: "numeric" })}
         </h4>
-        <button onClick={nextMonth} className="text-teal-600 hover:text-teal-800 p-1.5 rounded-full hover:bg-teal-50 transition">
-          <ChevronRight size={20} />
+        <button onClick={nextMonth} className="text-teal-600 hover:text-teal-800 p-1 sm:p-1.5 rounded-full hover:bg-teal-50 transition">
+          <ChevronRight size={18} className="sm:size-20" />
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center text-xs flex-1">
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-center text-[10px] sm:text-xs flex-1">
         {dayNames.map((d) => (
-          <div key={d} className="font-semibold text-gray-400 py-1.5">{d}</div>
+          <div key={d} className="font-semibold text-gray-400 py-1 sm:py-1.5">{d}</div>
         ))}
         {Array.from({ length: firstDayOfWeek }).map((_, i) => (
           <div key={`empty-${i}`} />
@@ -122,11 +122,11 @@ function BookedCalendar({ bookings }: { bookings: BookingData[] }) {
           const day = i + 1;
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const isBooked = bookedDates.has(dateStr);
-          const todayClass = isToday(day) ? "ring-2 ring-teal-500 ring-offset-1" : "";
+          const todayClass = isToday(day) ? "ring-1 sm:ring-2 ring-teal-500 ring-offset-1" : "";
           return (
             <div
               key={day}
-              className={`relative py-1.5 rounded-lg text-sm font-medium transition cursor-default select-none ${
+              className={`relative py-1 sm:py-1.5 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition cursor-default select-none ${
                 isBooked
                   ? "bg-red-100 text-red-600"
                   : "bg-white/80 text-gray-700 hover:bg-teal-50"
@@ -135,21 +135,21 @@ function BookedCalendar({ bookings }: { bookings: BookingData[] }) {
             >
               {day}
               {isBooked && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-red-400 rounded-full" />
+                <span className="absolute bottom-0.5 sm:bottom-0.5 left-1/2 -translate-x-1/2 w-0.5 h-0.5 sm:w-1 sm:h-1 bg-red-400 rounded-full" />
               )}
             </div>
           );
         })}
       </div>
-      <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-gray-500">
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 bg-red-100 border border-red-200 rounded" /> Booked
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-[10px] sm:text-xs text-gray-500">
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <span className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-red-100 border border-red-200 rounded" /> Booked
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 bg-white/80 border border-gray-200 rounded" /> Available
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <span className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-white/80 border border-gray-200 rounded" /> Available
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 bg-white/80 rounded ring-2 ring-teal-500" /> Today
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <span className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 bg-white/80 rounded ring-1 sm:ring-2 ring-teal-500" /> Today
         </div>
       </div>
     </div>

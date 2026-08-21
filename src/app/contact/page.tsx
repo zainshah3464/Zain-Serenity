@@ -78,7 +78,7 @@ export default function ContactPage() {
   );
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#e0f7f6] via-white to-[#e6fcf5]">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#ecfdf5] via-white to-[#e0f7f6]">
       {/* ========== Animated Background Ocean ========== */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Soft wave shapes */}
@@ -131,55 +131,53 @@ export default function ContactPage() {
           animate={{ y: [0, -20, 0], rotate: [0, 10, 0], x: [0, 15, 0] }}
           transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
         >
-          <BottleIcon className="w-10 h-10 text-teal-500/40" />
+          <BottleIcon className="w-8 h-8 sm:w-10 sm:h-10 text-teal-500/40" />
         </motion.div>
         <motion.div
           className="absolute bottom-1/4 right-[8%]"
           animate={{ y: [0, 25, 0], rotate: [0, -8, 0], x: [0, -12, 0] }}
           transition={{ repeat: Infinity, duration: 10, ease: "easeInOut", delay: 2 }}
         >
-          <BottleIcon className="w-8 h-8 text-teal-500/40" />
+          <BottleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-teal-500/40" />
         </motion.div>
-
-    
       </div>
 
       {/* ========== Main Content ========== */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 md:py-28 grid md:grid-cols-2 gap-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 md:py-28 grid md:grid-cols-2 gap-8 lg:gap-12">
         {/* ---------- Left Column: Heading + Info ---------- */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7 }}
-          className="flex flex-col justify-center space-y-8"
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="flex flex-col justify-center space-y-6 sm:space-y-8"
         >
           <div className="text-center md:text-left">
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 shadow-xl mb-6"
+              initial={{ scale: 0, rotate: -15 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+              className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 shadow-xl mb-4 sm:mb-6"
             >
               <motion.div
                 animate={{ y: [0, -5, 0] }}
                 transition={{ repeat: Infinity, duration: 3 }}
               >
-                <BottleIcon className="w-10 h-10 text-white" />
+                <BottleIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
               </motion.div>
             </motion.div>
-            <h1 className="text-4xl md:text-5xl font-['Playfair_Display',serif] font-extrabold text-gray-800">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-['Playfair_Display',serif] font-extrabold text-gray-800">
               Send Us a{" "}
               <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                 Message
               </span>
             </h1>
-            <p className="text-gray-600 mt-4 max-w-md mx-auto md:mx-0 leading-relaxed">
-              Drop your thoughts into our bottle – we’ll get back to you faster than the tide.
+            <p className="text-gray-600 mt-3 sm:mt-4 max-w-md mx-auto md:mx-0 leading-relaxed text-sm sm:text-base">
+              Drop your thoughts into our bottle – we'll get back to you faster than the tide.
             </p>
           </div>
 
           {/* Contact Info Cards */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {[
               { icon: MapPin, text: "Coastal Road, Crystal Cove, Grand Gaube, Mauritius" },
               { icon: Phone, text: "+230 5 204 9191" },
@@ -189,14 +187,14 @@ export default function ContactPage() {
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-                className="flex items-center gap-4 p-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 shadow-md hover:shadow-xl transition-shadow group cursor-default"
+                transition={{ delay: 0.4 + i * 0.1, duration: 0.5, ease: "easeOut" }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 shadow-md hover:shadow-xl transition-shadow group cursor-default"
               >
-                <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center group-hover:bg-teal-200 transition-colors">
-                  <item.icon className="text-teal-600 w-5 h-5" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 rounded-xl flex items-center justify-center group-hover:bg-teal-200 transition-colors shrink-0">
+                  <item.icon className="text-teal-600 w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-gray-700 font-medium text-sm md:text-base">
+                <p className="text-gray-700 font-medium text-xs sm:text-sm md:text-base">
                   {item.text}
                 </p>
               </motion.div>
@@ -208,28 +206,33 @@ export default function ContactPage() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
+          transition={{ delay: 0.3, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="relative"
         >
-          <div className="bg-white/80 backdrop-blur-md border border-white/80 rounded-3xl p-8 md:p-10 shadow-2xl">
-            <h2 className="text-2xl font-['Playfair_Display',serif] font-bold text-gray-800 mb-8 flex items-center gap-3">
-              <MessageSquare className="text-teal-600 w-7 h-7" />
+          <div className="bg-white/80 backdrop-blur-md border border-white/80 rounded-[2rem] p-5 sm:p-8 md:p-10 shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(20,184,166,0.3)] transition-shadow">
+            <h2 className="text-xl sm:text-2xl font-['Playfair_Display',serif] font-bold text-gray-800 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+              <MessageSquare className="text-teal-600 w-6 h-6 sm:w-7 sm:h-7" />
               Your Message
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
               {/* Name */}
-              <div className="relative">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.4, ease: "easeOut" }}
+                className="relative"
+              >
                 <motion.label
-                  className={`absolute left-12 transition-all duration-200 pointer-events-none ${
+                  className={`absolute left-11 sm:left-12 transition-all duration-200 pointer-events-none ${
                     focusedField === "name" || form.name
                       ? "-top-3 text-xs text-teal-600 bg-white px-1 rounded"
-                      : "top-1/2 -translate-y-1/2 text-gray-400"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 text-sm sm:text-base"
                   }`}
                 >
                   Your Name
                 </motion.label>
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-teal-500 w-5 h-5" />
+                <User className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-teal-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="text"
                   required
@@ -237,22 +240,27 @@ export default function ContactPage() {
                   onFocus={() => setFocusedField("name")}
                   onBlur={() => setFocusedField(null)}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full pl-12 pr-4 py-4 bg-white/90 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 text-gray-700 transition-all"
+                  className="w-full pl-11 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/90 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 text-gray-700 transition-all text-sm sm:text-base"
                 />
-              </div>
+              </motion.div>
 
               {/* Email */}
-              <div className="relative">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.65, duration: 0.4, ease: "easeOut" }}
+                className="relative"
+              >
                 <motion.label
-                  className={`absolute left-12 transition-all duration-200 pointer-events-none ${
+                  className={`absolute left-11 sm:left-12 transition-all duration-200 pointer-events-none ${
                     focusedField === "email" || form.email
                       ? "-top-3 text-xs text-teal-600 bg-white px-1 rounded"
-                      : "top-1/2 -translate-y-1/2 text-gray-400"
+                      : "top-1/2 -translate-y-1/2 text-gray-400 text-sm sm:text-base"
                   }`}
                 >
                   Email Address
                 </motion.label>
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-teal-500 w-5 h-5" />
+                <Mail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-teal-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="email"
                   required
@@ -260,40 +268,48 @@ export default function ContactPage() {
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full pl-12 pr-4 py-4 bg-white/90 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 text-gray-700 transition-all"
+                  className="w-full pl-11 sm:pl-12 pr-4 py-3 sm:py-4 bg-white/90 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 text-gray-700 transition-all text-sm sm:text-base"
                 />
-              </div>
+              </motion.div>
 
               {/* Message */}
-              <div className="relative">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.4, ease: "easeOut" }}
+                className="relative"
+              >
                 <motion.label
-                  className={`absolute left-12 transition-all duration-200 pointer-events-none ${
+                  className={`absolute left-11 sm:left-12 transition-all duration-200 pointer-events-none ${
                     focusedField === "message" || form.message
                       ? "top-1 text-xs text-teal-600 bg-white px-1 rounded"
-                      : "top-4 text-gray-400"
+                      : "top-4 text-gray-400 text-sm sm:text-base"
                   }`}
                 >
                   Your Message
                 </motion.label>
-                <MessageSquare className="absolute left-4 top-4 text-teal-500 w-5 h-5" />
+                <MessageSquare className="absolute left-3 sm:left-4 top-4 text-teal-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <textarea
-                  rows={5}
+                  rows={4}
                   required
                   value={form.message}
                   onFocus={() => setFocusedField("message")}
                   onBlur={() => setFocusedField(null)}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full pl-12 pr-4 py-4 bg-white/90 border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 text-gray-700 resize-none transition-all"
+                  className="w-full pl-11 sm:pl-12 pr-4 py-3 sm:py-4 min-h-[100px] sm:min-h-[120px] bg-white/90 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100 text-gray-700 resize-none transition-all text-sm sm:text-base"
                 />
-              </div>
+              </motion.div>
 
               {/* Submit Button */}
               <motion.button
                 type="submit"
                 disabled={status === "loading"}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.95, duration: 0.4, ease: "easeOut" }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
-                className="w-full relative overflow-hidden bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-semibold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full relative overflow-hidden bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-shadow disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 {status === "loading" ? (
                   <>
@@ -315,9 +331,9 @@ export default function ContactPage() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="text-green-700 bg-green-100 border border-green-200 p-3 rounded-2xl text-sm text-center flex items-center justify-center gap-2"
+                    className="text-green-700 bg-green-100 border border-green-200 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-center flex items-center justify-center gap-2"
                   >
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                     Message sent successfully! We'll reply within 24 hours.
                   </motion.p>
                 )}
@@ -326,9 +342,9 @@ export default function ContactPage() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="text-red-700 bg-red-100 border border-red-200 p-3 rounded-2xl text-sm text-center flex items-center justify-center gap-2"
+                    className="text-red-700 bg-red-100 border border-red-200 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm text-center flex items-center justify-center gap-2"
                   >
-                    <AlertCircle className="w-5 h-5 text-red-600" />
+                    <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                     Oops! Something went wrong. Please try again.
                   </motion.p>
                 )}
