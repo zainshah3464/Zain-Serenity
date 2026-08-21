@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react"; // ← useEffect added
 import Image from "next/image";
 import {
   motion,
@@ -9,6 +9,7 @@ import {
   useSpring,
 } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { trackViewGallery } from "@/lib/ga4"; // ← GA4 tracking import
 
 /* ────────────────────────────────────
    Gallery images
@@ -176,6 +177,11 @@ function ImageLightbox({
 export default function Gallery() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  // GA4: view_gallery event on component mount
+  useEffect(() => {
+    trackViewGallery({ image_count: galleryImages.length });
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,

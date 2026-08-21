@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Search, Calendar, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { trackSelectDate, trackSearchAvailability } from "@/lib/ga4"; // ← GA4 tracking imports
 
 export default function SearchBar() {
   const router = useRouter();
@@ -13,6 +14,11 @@ export default function SearchBar() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    // GA4: search_availability event
+    trackSearchAvailability({
+      check_in_date: checkIn?.toISOString().split('T')[0],
+      check_out_date: checkOut?.toISOString().split('T')[0],
+    });
     const params = new URLSearchParams();
     if (checkIn) params.append("checkIn", checkIn.toISOString().split("T")[0]);
     if (checkOut) params.append("checkOut", checkOut.toISOString().split("T")[0]);
@@ -44,6 +50,12 @@ export default function SearchBar() {
           selected={checkIn}
           onChange={(date: Date | null) => {
             setCheckIn(date);
+            // GA4: select_date event for check-in
+            if (date) {
+              trackSelectDate({
+                check_in_date: date.toISOString().split('T')[0],
+              });
+            }
             if (date && checkOut && date > checkOut) {
               setCheckOut(null);
             }
@@ -82,6 +94,12 @@ export default function SearchBar() {
           selected={checkOut}
           onChange={(date: Date | null) => {
             setCheckOut(date);
+            // GA4: select_date event for check-out
+            if (date) {
+              trackSelectDate({
+                check_out_date: date.toISOString().split('T')[0],
+              });
+            }
             if (date && checkIn && date < checkIn) {
               setCheckIn(null);
             }

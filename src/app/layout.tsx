@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import PublicLayoutWrapper from "@/components/PublicLayoutWrapper";
 import { HeroLoadingProvider } from "@/components/HeroLoadingContext"; // ← Import added
+import Script from "next/script"; // ← GA4 ke liye import
 
 // ─── Professional Metadata ───────────────────────────────
 export const metadata: Metadata = {
@@ -103,6 +104,22 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-gradient-to-b from-white via-green-50/10 to-gray-50 text-gray-800 antialiased">
+        {/* GA4 Tracking Scripts */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
+
         <HeroLoadingProvider>
           <Providers>
             <PublicLayoutWrapper>{children}</PublicLayoutWrapper>

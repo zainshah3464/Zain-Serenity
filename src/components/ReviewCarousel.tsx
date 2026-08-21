@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion"; // ← useInView added
 import { Star, Quote, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { Inter, Playfair_Display } from "next/font/google";
+import { trackViewReviews } from "@/lib/ga4"; // ← GA4 tracking import
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 const playfair = Playfair_Display({ subsets: ["latin"], display: "swap" });
@@ -198,6 +199,16 @@ export default function ReviewCarousel() {
   const [isPaused, setIsPaused] = useState(false);
   const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // GA4: view_reviews tracking with IntersectionObserver
+  const sectionRef = useRef<HTMLDivElement>(null); // attach to <section>
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+  useEffect(() => {
+    if (isInView) {
+      trackViewReviews({ page_path: window.location.pathname });
+    }
+  }, [isInView]);
+
   // Responsive items per page
   useEffect(() => {
     const handleResize = () => {
@@ -251,6 +262,7 @@ export default function ReviewCarousel() {
 
   return (
     <section
+      ref={sectionRef} // ← added for view_reviews tracking
       className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-br from-white via-gray-50 to-white"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}

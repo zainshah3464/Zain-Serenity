@@ -1,11 +1,12 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ← useEffect added
 import { useSession } from "next-auth/react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./datepicker-custom.css";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackBeginCheckout, trackAddGuest } from "@/lib/ga4"; // ← GA4 tracking imports
 import {
   CalendarDays, Users, DollarSign, AlertCircle,
   Plus, Minus, Star, Wifi, Mountain, Car, Coffee,
@@ -64,12 +65,42 @@ export default function BookingContent() {
   const tax = Math.round(subtotal * 0.1);
   const total = subtotal + tax;
 
+  // GA4 Tracking: begin_checkout on page load
+  useEffect(() => {
+    trackBeginCheckout({
+      value: total, // initially 0 (if no dates selected) or calculated total
+      currency: "USD",
+      items: [
+        {
+          item_id: roomId,
+          item_name: roomName,
+          price: pricePerNight,
+        },
+      ],
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // fire only once on mount
+
   const handleGuestChange = (delta: number) => {
-    setGuests((prev) => Math.min(5, Math.max(1, prev + delta)));
+    setGuests((prev) => {
+      const newGuests = Math.min(5, Math.max(1, prev + delta));
+      // GA4: add_guest event for guests count
+      trackAddGuest({
+        guest_count: newGuests,
+      });
+      return newGuests;
+    });
   };
 
   const handleChildrenChange = (delta: number) => {
-    setChildren((prev) => Math.min(5, Math.max(0, prev + delta)));
+    setChildren((prev) => {
+      const newChildren = Math.min(5, Math.max(0, prev + delta));
+      // GA4: add_guest event for children count
+      trackAddGuest({
+        child_count: newChildren,
+      });
+      return newChildren;
+    });
   };
 
   const toggleRequestOption = (option: string) => {

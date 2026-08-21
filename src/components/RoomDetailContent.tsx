@@ -1,10 +1,11 @@
 "use client";
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, Suspense, useEffect } from "react"; // ← useEffect added
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import ReviewForm from "@/components/ReviewForm";
 import Room3DViewer from "@/components/Room3DViewer";
+import { trackViewItem } from "@/lib/ga4"; // ← GA4 tracking import
 import {
   Star, Check, ChevronRight, ChevronLeft,
   Users, BedDouble, Ruler, Wifi, Tv, Wind, Mountain, Coffee,
@@ -180,6 +181,16 @@ export default function RoomDetailContent({
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const galleryImages = room.images?.length ? room.images : [room.image];
+
+  // GA4 Tracking: view_item event on room detail view
+  useEffect(() => {
+    trackViewItem({
+      item_id: room._id,
+      item_name: room.name,
+      price: room.price,
+      item_category: room.roomType,
+    });
+  }, [room]);
 
   const avgRating =
     reviews.length > 0

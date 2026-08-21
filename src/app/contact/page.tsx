@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { trackGenerateLead } from "@/lib/ga4"; // ← GA4 tracking import
 import {
   Mail,
   User,
@@ -45,6 +46,12 @@ export default function ContactPage() {
       });
       if (res.ok) {
         setStatus("success");
+        // GA4: generate_lead event on successful form submission
+        trackGenerateLead({
+          form_id: 'contact_form',
+          form_name: 'Contact Page Form',
+          page_path: '/contact',
+        });
         setForm({ name: "", email: "", message: "" });
         setTimeout(() => setStatus("idle"), 4000);
       } else {

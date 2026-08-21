@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import RoomCard from "@/components/RoomCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Search, X, ArrowLeft, ArrowRight } from "lucide-react";
+import { trackViewItemList } from "@/lib/ga4"; // ← GA4 tracking import
 
 interface Room {
   _id: string;
@@ -15,6 +16,7 @@ interface Room {
   isFeatured?: boolean;
   rating?: number;
   status?: string;
+  roomType?: string; // ← Yeh add kiya gaya hai
 }
 
 // Improved Shimmer Skeleton Card
@@ -84,6 +86,19 @@ export default function RoomsPage() {
   useEffect(() => {
     fetchRooms(currentPage);
   }, [currentPage, fetchRooms]);
+
+  // GA4 Tracking: view_item_list jab rooms load ho jayein
+  useEffect(() => {
+    if (rooms.length > 0) {
+      const items = rooms.map((room) => ({
+        item_id: room._id,
+        item_name: room.name,
+        price: room.price,
+        item_category: room.roomType || 'room',
+      }));
+      trackViewItemList(items);
+    }
+  }, [rooms]);
 
   const clearDates = () => {
     router.replace("/rooms");

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Playfair_Display, Inter, Caveat } from "next/font/google";
 import SearchBar from "./SearchBar";
 import { useHeroLoading } from "./HeroLoadingContext"; // 👈 import
+import { trackVideoEngagement } from "@/lib/ga4"; // ← GA4 tracking import
 
 const playfair = Playfair_Display({ subsets: ["latin"], display: "swap" });
 const inter = Inter({ subsets: ["latin"], display: "swap" });
@@ -503,6 +504,32 @@ export default function StoryHero() {
     setHasEnded(true);
     scrollToNext();
   }, [scrollToNext]);
+
+  // GA4: video engagement tracking (start, pause, complete)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handlePlay = () => {
+      trackVideoEngagement({ video_title: 'Hero Video', action: 'start' });
+    };
+    const handlePause = () => {
+      trackVideoEngagement({ video_title: 'Hero Video', action: 'pause' });
+    };
+    const handleEnded = () => {
+      trackVideoEngagement({ video_title: 'Hero Video', action: 'complete' });
+    };
+
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('ended', handleEnded);
+
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;

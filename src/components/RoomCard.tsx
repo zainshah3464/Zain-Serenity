@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { trackSelectItem } from "@/lib/ga4"; // ← GA4 tracking import
 
 interface RoomProps {
   _id: string;
@@ -17,6 +18,16 @@ interface RoomProps {
 
 export default function RoomCard({ room, index = 0 }: { room: RoomProps; index?: number }) {
   const isMaintenance = room.status === "maintenance";
+
+  // GA4: select_item event handler
+  const handleSelect = () => {
+    trackSelectItem({
+      item_id: room._id,
+      item_name: room.name,
+      price: room.price,
+      item_category: (room as any).roomType || "room",
+    });
+  };
 
   return (
     <motion.div
@@ -125,6 +136,7 @@ export default function RoomCard({ room, index = 0 }: { room: RoomProps; index?:
         ) : (
           <Link
             href={`/rooms/${room._id}`}
+            onClick={handleSelect}
             className="mt-4 inline-flex items-center justify-center w-full py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white transition-all shadow-md hover:shadow-lg"
           >
             View Details
