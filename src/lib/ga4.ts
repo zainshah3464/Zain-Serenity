@@ -13,6 +13,13 @@ export const trackEvent = (eventName: string, params?: Record<string, any>) => {
   }
 };
 
+
+
+
+export const trackLogin = (method: string) => {
+  trackEvent('login', { method });
+};
+
 // Ecommerce specific
 export const trackViewItemList = (items: any[]) => {
   trackEvent('view_item_list', { items });

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { trackEvent } from "@/lib/ga4"; // ← GA4 tracking import
 
 export default function LoginContent() {
   const router = useRouter();
@@ -38,7 +39,16 @@ export default function LoginContent() {
     if (result?.error) {
       setError(result.error);
       setTimeout(() => setError(""), 5000);
+    } else if (result?.ok) {
+      // GA4: login event for credentials
+      trackEvent('login', { method: 'credentials' });
     }
+  };
+
+  // Google sign-in with tracking
+  const handleGoogleSignIn = () => {
+    trackEvent('login', { method: 'google' });
+    signIn("google", { callbackUrl: "/" });
   };
 
   if (status === "loading") {
@@ -168,7 +178,7 @@ export default function LoginContent() {
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={handleGoogleSignIn}
           className="mt-4 w-full bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-50 transition font-semibold"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
