@@ -9,26 +9,27 @@ function UserIDTracker() {
     if (status === 'authenticated' && session?.user?.id && typeof window !== 'undefined' && (window as any).gtag) {
       const gtag = (window as any).gtag;
       
-      // 1. Set user_id
+      // user_id set karo
       gtag('set', 'user_id', session.user.id);
-      
-      // 2. Update config
       gtag('config', process.env.NEXT_PUBLIC_GA_ID, {
         user_id: session.user.id,
       });
 
-      // 3. Fire login event if loginMethod exists in localStorage
+      // Custom event to "lock in" the user_id into GA4
+      gtag('event', 'user_identified', {
+        user_id: session.user.id,
+      });
+
+      // login event fire karo agar localStorage me loginMethod hai
       const loginMethod = localStorage.getItem('loginMethod');
       if (loginMethod) {
         gtag('event', 'login', {
           method: loginMethod,
           user_id: session.user.id,
         });
-        // Remove stored method to avoid duplicate events on page refresh
         localStorage.removeItem('loginMethod');
       }
 
-      // Debugging (optional)
       console.log('✅ GA4 user_id set:', session.user.id);
     }
   }, [status, session]);
