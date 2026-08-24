@@ -9,18 +9,25 @@ function UserIDTracker() {
     if (status === 'authenticated' && session?.user?.id && typeof window !== 'undefined' && (window as any).gtag) {
       const gtag = (window as any).gtag;
       
-      // user_id set karo
+      // 1. Set user_id (cross-device identifier)
       gtag('set', 'user_id', session.user.id);
+      
+      // 2. Set user_id as a user property (ye Realtime me dikhega)
+      gtag('set', 'user_properties', {
+        user_id: session.user.id,
+      });
+
+      // 3. Update config with user_id
       gtag('config', process.env.NEXT_PUBLIC_GA_ID, {
         user_id: session.user.id,
       });
 
-      // Custom event to "lock in" the user_id into GA4
+      // 4. Fire user_identified event (with user_id parameter)
       gtag('event', 'user_identified', {
         user_id: session.user.id,
       });
 
-      // login event fire karo agar localStorage me loginMethod hai
+      // 5. Login event if loginMethod exists
       const loginMethod = localStorage.getItem('loginMethod');
       if (loginMethod) {
         gtag('event', 'login', {
