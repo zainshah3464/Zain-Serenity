@@ -6,38 +6,46 @@ function UserIDTracker() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.id && typeof window !== 'undefined' && (window as any).gtag) {
+    if (
+      status === "authenticated" &&
+      session?.user?.id &&
+      typeof window !== "undefined" &&
+      (window as any).gtag
+    ) {
       const gtag = (window as any).gtag;
-      
-      // 1. Set user_id (cross-device identifier)
-      gtag('set', 'user_id', session.user.id);
-      
-      // 2. Set user_id as a user property (ye Realtime me dikhega)
-      gtag('set', 'user_properties', {
+      const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
+      // 1. User-ID feature ke liye (reserved parameter)
+      gtag("set", "user_id", session.user.id);
+
+      // 2. Custom User Property (Realtime card me dikhne ke liye)
+      //    ⚠️ yahan 'user_id' mat use karo, reserved hai
+      gtag("set", "user_properties", {
+        crm_user_id: session.user.id,
+      });
+
+      // 3. Config update with user_id
+      gtag("config", GA_ID, {
         user_id: session.user.id,
       });
 
-      // 3. Update config with user_id
-      gtag('config', process.env.NEXT_PUBLIC_GA_ID, {
+      // 4. Event fire karo
+      gtag("event", "user_identified", {
         user_id: session.user.id,
       });
 
-      // 4. Fire user_identified event (with user_id parameter)
-      gtag('event', 'user_identified', {
-        user_id: session.user.id,
-      });
-
-      // 5. Login event if loginMethod exists
-      const loginMethod = localStorage.getItem('loginMethod');
+      // 5. Login method agar hai
+      const loginMethod = localStorage.getItem("loginMethod");
       if (loginMethod) {
-        gtag('event', 'login', {
+        gtag("event", "login", {
           method: loginMethod,
           user_id: session.user.id,
         });
-        localStorage.removeItem('loginMethod');
+        localStorage.removeItem("loginMethod");
       }
 
-      console.log('✅ GA4 user_id set:', session.user.id);
+      console.log("✅ GA4 user_id set:", session.user.id);
+      console.log("✅ GA4 user_property crm_user_id set:", session.user.id);
     }
   }, [status, session]);
 
