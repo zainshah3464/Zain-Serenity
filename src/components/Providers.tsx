@@ -43,9 +43,6 @@ function UserIDTracker() {
         });
         localStorage.removeItem("loginMethod");
       }
-
-      console.log("✅ GA4 user_id set:", session.user.id);
-      console.log("✅ GA4 user_property crm_user_id set:", session.user.id);
     }
   }, [status, session]);
 
