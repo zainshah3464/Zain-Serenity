@@ -20,291 +20,326 @@ export async function GET(req: Request) {
 
   await dbConnect();
 
-  // --- Revenue data based on range ---
-  let revenueData: { date: string; total: number }[] = [];
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
+  // Load all rooms once for reuse
+  const allRooms = await Room.find().lean();
+  const roomMap = new Map(allRooms.map((r) => [r._id.toString(), { name: r.name, roomType: r.roomType }]));
+
+  // ---------- REVENUE DATA (Solid) ----------
+  const buildRevenueData = async (startDate: Date, endDate?: Date) => {
+    const filter: any = {
+      status: { $ne: "cancelled" },
+      createdAt: { $gte: startDate },
+    };
+    if (endDate) {
+      filter.createdAt.$lte = endDate;
+    }
+
+    const bookings = await Booking.find(filter).select("createdAt totalPrice").lean();
+    const dailyMap: Record<string, number> = {};
+
+    bookings.forEach((b) => {
+      const date = new Date(b.createdAt).toISOString().split("T")[0];
+      dailyMap[date] = (dailyMap[date] || 0) + b.totalPrice;
+    });
+
+    return Object.entries(dailyMap)
+      .map(([date, total]) => ({ date, total }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  };
+
+  let revenueData: { date: string; total: number }[] = [];
+
   if (range === "all") {
-    const allBookings = await Booking.find({ status: { $ne: "cancelled" } }).lean();
-    const revenueMap: Record<string, number> = {};
-    allBookings.forEach(b => {
-      const date = new Date(b.createdAt).toISOString().split("T")[0];
-      revenueMap[date] = (revenueMap[date] || 0) + b.totalPrice;
-    });
-    revenueData = Object.entries(revenueMap).map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    revenueData = await buildRevenueData(new Date(0));
   } else if (range === "thisYear") {
-    const startDate = new Date(now.getFullYear(), 0, 1);
-    const bookings = await Booking.find({ createdAt: { $gte: startDate }, status: { $ne: "cancelled" } }).lean();
-    const dailyMap: Record<string, number> = {};
-    bookings.forEach(b => {
-      const date = new Date(b.createdAt).toISOString().split("T")[0];
-      dailyMap[date] = (dailyMap[date] || 0) + b.totalPrice;
-    });
-    revenueData = Object.entries(dailyMap).map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    revenueData = await buildRevenueData(new Date(now.getFullYear(), 0, 1));
   } else if (range === "lastYear") {
-    const startDate = new Date(now.getFullYear() - 1, 0, 1);
-    const endDate = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59);
-    const bookings = await Booking.find({
-      createdAt: { $gte: startDate, $lte: endDate },
-      status: { $ne: "cancelled" }
-    }).lean();
-    const dailyMap: Record<string, number> = {};
-    bookings.forEach(b => {
-      const date = new Date(b.createdAt).toISOString().split("T")[0];
-      dailyMap[date] = (dailyMap[date] || 0) + b.totalPrice;
-    });
-    revenueData = Object.entries(dailyMap).map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    const start = new Date(now.getFullYear() - 1, 0, 1);
+    const end = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59);
+    revenueData = await buildRevenueData(start, end);
   } else if (range === "thisMonth") {
-    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    const bookings = await Booking.find({ createdAt: { $gte: startDate }, status: { $ne: "cancelled" } }).lean();
-    const dailyMap: Record<string, number> = {};
-    bookings.forEach(b => {
-      const date = new Date(b.createdAt).toISOString().split("T")[0];
-      dailyMap[date] = (dailyMap[date] || 0) + b.totalPrice;
-    });
-    revenueData = Object.entries(dailyMap).map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date));
-  } else if (range === "custom" && customStart && customEnd) {
-    const start = new Date(customStart);
-    const end = new Date(customEnd);
+    revenueData = await buildRevenueData(new Date(now.getFullYear(), now.getMonth(), 1));
+  } else if (range === "custom") {
+    const start = customStart ? new Date(customStart) : new Date(0);
+    const end = customEnd ? new Date(customEnd) : now;
     end.setHours(23, 59, 59, 999);
-    const bookings = await Booking.find({ createdAt: { $gte: start, $lte: end }, status: { $ne: "cancelled" } }).lean();
-    const dailyMap: Record<string, number> = {};
-    bookings.forEach(b => {
-      const date = new Date(b.createdAt).toISOString().split("T")[0];
-      dailyMap[date] = (dailyMap[date] || 0) + b.totalPrice;
-    });
-    revenueData = Object.entries(dailyMap).map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    revenueData = await buildRevenueData(start, end);
   } else {
-    // default last 7 days
-    const startDate = new Date(now);
-    startDate.setDate(now.getDate() - 6);
-    startDate.setHours(0, 0, 0, 0);
-    const bookings = await Booking.find({ createdAt: { $gte: startDate }, status: { $ne: "cancelled" } }).lean();
-    const dailyMap: Record<string, number> = {};
-    bookings.forEach(b => {
-      const date = new Date(b.createdAt).toISOString().split("T")[0];
-      dailyMap[date] = (dailyMap[date] || 0) + b.totalPrice;
-    });
-    revenueData = Object.entries(dailyMap).map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    // default 7 days
+    const start = new Date(now);
+    start.setDate(now.getDate() - 6);
+    start.setHours(0, 0, 0, 0);
+    revenueData = await buildRevenueData(start);
   }
 
-  // --- Today's stats counts ---
-  const todayCheckinsCount = await Booking.countDocuments({
-    checkIn: { $gte: todayStart, $lt: todayEnd },
-    status: { $ne: "cancelled" }
-  });
-  const todayCheckoutsCount = await Booking.countDocuments({
-    checkOut: { $gte: todayStart, $lt: todayEnd },
-    status: { $ne: "cancelled" }
-  });
-  const todayRevenue = (await Booking.find({
-    createdAt: { $gte: todayStart, $lt: todayEnd },
-    status: { $ne: "cancelled" }
-  }).lean()).reduce((sum, b) => sum + b.totalPrice, 0);
-  const todayNewUsersCount = await User.countDocuments({
-    createdAt: { $gte: todayStart, $lt: todayEnd }
-  });
-
-  // --- Today's detailed lists (for popups) ---
+  // ---------- TODAY CHECK-INS & REVENUE (FIXED) ----------
   const todayCheckinsList = await Booking.find({
     checkIn: { $gte: todayStart, $lt: todayEnd },
-    status: { $ne: "cancelled" }
-  }).sort({ checkIn: 1 }).lean();
+    status: { $ne: "cancelled" },
+  })
+    .sort({ checkIn: 1 })
+    .lean();
+
+  const todayRevenue = todayCheckinsList.reduce((sum, b) => sum + b.totalPrice, 0);
 
   const todayCheckoutsList = await Booking.find({
     checkOut: { $gte: todayStart, $lt: todayEnd },
-    status: { $ne: "cancelled" }
-  }).sort({ checkOut: 1 }).lean();
+    status: { $ne: "cancelled" },
+  })
+    .sort({ checkOut: 1 })
+    .lean();
 
   const todayNewUsersList = await User.find({
-    createdAt: { $gte: todayStart, $lt: todayEnd }
-  }).select("name email createdAt").sort({ createdAt: -1 }).lean();
+    createdAt: { $gte: todayStart, $lt: todayEnd },
+  })
+    .select("name email createdAt")
+    .sort({ createdAt: -1 })
+    .lean();
 
   const todayReviewsList = await Review.find({
-    createdAt: { $gte: todayStart, $lt: todayEnd }
-  }).sort({ createdAt: -1 }).lean();
+    createdAt: { $gte: todayStart, $lt: todayEnd },
+  })
+    .sort({ createdAt: -1 })
+    .lean();
 
-  // Populate user names for today's bookings & reviews
-  const todayCheckinsPopulated = await Promise.all(todayCheckinsList.map(async (b) => {
-    const room = await Room.findById(b.roomId).select("name").lean();
-    const user = await User.findById(b.userId).select("name email").lean();
-    return { ...b, roomName: room?.name || "Deleted", user };
-  }));
+  // Helper to populate booking room and user
+  const populateBooking = async (b: any) => {
+    const [room, user] = await Promise.all([
+      Room.findById(b.roomId).select("name roomType").lean(),
+      User.findById(b.userId).select("name email").lean(),
+    ]);
+    return {
+      ...b,
+      roomName: room?.name || "Deleted",
+      roomType: room?.roomType || "",
+      user,
+    };
+  };
 
-  const todayCheckoutsPopulated = await Promise.all(todayCheckoutsList.map(async (b) => {
-    const room = await Room.findById(b.roomId).select("name").lean();
-    const user = await User.findById(b.userId).select("name email").lean();
-    return { ...b, roomName: room?.name || "Deleted", user };
-  }));
+  const todayCheckinsPopulated = await Promise.all(todayCheckinsList.map(populateBooking));
+  const todayCheckoutsPopulated = await Promise.all(todayCheckoutsList.map(populateBooking));
 
-  const todayReviewsPopulated = await Promise.all(todayReviewsList.map(async (r) => {
-    const user = await User.findById(r.userId).select("name email").lean();
-    return { ...r, user };
-  }));
+  const todayReviewsPopulated = await Promise.all(
+    todayReviewsList.map(async (r) => {
+      const [user, room] = await Promise.all([
+        User.findById(r.userId).select("name email").lean(),
+        Room.findById(r.roomId).select("name").lean(),
+      ]);
+      return { ...r, user, roomName: room?.name || "Deleted" };
+    })
+  );
 
-  // --- Total stats ---
+  // ---------- TOTAL STATS ----------
   const totalBookings = await Booking.countDocuments();
-  const totalRevenue = (await Booking.find({ status: { $ne: "cancelled" } }).lean())
-    .reduce((sum, b) => sum + b.totalPrice, 0);
-  const statusCountsRaw = await Booking.aggregate([
-    { $group: { _id: "$status", count: { $sum: 1 } } }
-  ]);
-  const statusCounts = { pending: 0, confirmed: 0, cancelled: 0 };
-  statusCountsRaw.forEach((s: any) => {
-    (statusCounts as any)[s._id] = s.count;  // ✅ fixed TypeScript error
+
+  const allNonCancelledBookings = await Booking.find({ status: { $ne: "cancelled" } })
+    .select("roomId totalPrice")
+    .lean();
+
+  const totalRevenue = allNonCancelledBookings.reduce((sum, b) => sum + b.totalPrice, 0);
+
+  // All-time revenue breakdown by room (solid)
+  const allTimeRevenueAgg: Record<string, number> = {};
+  allNonCancelledBookings.forEach((b) => {
+    const roomId = b.roomId.toString();
+    allTimeRevenueAgg[roomId] = (allTimeRevenueAgg[roomId] || 0) + b.totalPrice;
   });
 
-  // --- Room stats ---
-  const allRooms = await Room.find().lean();
-  const totalRooms = allRooms.length;
-  const activeRooms = allRooms.filter(r => r.status === "active").length;
-  const inactiveRooms = allRooms.filter(r => r.status === "inactive").length;
-  const maintenanceRooms = allRooms.filter(r => r.status === "maintenance").length;
+  const totalRevenueBreakdownAll: Record<string, number> = {};
+  for (const [roomId, total] of Object.entries(allTimeRevenueAgg)) {
+    const roomInfo = roomMap.get(roomId);
+    const roomName = roomInfo?.name || "Deleted Room";
+    totalRevenueBreakdownAll[roomName] = total;
+  }
 
-  // Current occupancy
+  const statusCountsRaw = await Booking.aggregate([
+    { $group: { _id: "$status", count: { $sum: 1 } } },
+  ]);
+
+  const statusCounts: any = { pending: 0, confirmed: 0, cancelled: 0 };
+  statusCountsRaw.forEach((s: any) => {
+    statusCounts[s._id] = s.count;
+  });
+
+  // ---------- ROOM STATS ----------
+  const totalRooms = allRooms.length;
+  const activeRooms = allRooms.filter((r) => r.status === "active").length;
+  const inactiveRooms = allRooms.filter((r) => r.status === "inactive").length;
+  const maintenanceRooms = allRooms.filter((r) => r.status === "maintenance").length;
+
   const overlapping = await Booking.find({
     checkIn: { $lt: todayEnd },
     checkOut: { $gt: todayStart },
-    status: { $ne: "cancelled" }
+    status: { $ne: "cancelled" },
   }).distinct("roomId");
+
   const occupiedCount = overlapping.length;
   const availableRooms = totalRooms - occupiedCount;
   const occupancyRate = totalRooms > 0 ? Math.round((occupiedCount / totalRooms) * 100) : 0;
 
-  // --- Pending bookings list ---
+  // ---------- PENDING BOOKINGS ----------
   const pendingBookingsList = await Booking.find({ status: "pending" })
-    .sort({ createdAt: -1 }).lean();
-  const pendingPopulated = await Promise.all(pendingBookingsList.map(async (b) => {
-    const room = await Room.findById(b.roomId).select("name").lean();
-    const user = await User.findById(b.userId).select("name email").lean();
-    return { ...b, roomName: room?.name || "Deleted", user };
-  }));
+    .sort({ createdAt: -1 })
+    .lean();
+  const pendingPopulated = await Promise.all(pendingBookingsList.map(populateBooking));
 
-  // --- Recent bookings (last 10) ---
+  // ---------- RECENT BOOKINGS ----------
   const recentBookings = await Booking.find().sort({ createdAt: -1 }).limit(10).lean();
-  const recentPopulated = await Promise.all(recentBookings.map(async (b) => {
-    const room = await Room.findById(b.roomId).select("name roomType").lean();
-    const user = await User.findById(b.userId).select("name email").lean();
-    return {
-      _id: b._id,
-      guestName: user?.name || "Unknown",
-      guestEmail: user?.email,
-      roomName: room?.name || "Deleted",
-      roomType: room?.roomType || "",
-      checkIn: b.checkIn,
-      checkOut: b.checkOut,
-      status: b.status,
-      totalPrice: b.totalPrice,
-      createdAt: b.createdAt,
-    };
-  }));
+  const recentPopulated = await Promise.all(
+    recentBookings.map(async (b) => {
+      const roomInfo = roomMap.get(b.roomId.toString());
+      const user = await User.findById(b.userId).select("name email").lean();
+      return {
+        _id: b._id,
+        guestName: user?.name || "Unknown",
+        guestEmail: user?.email,
+        roomName: roomInfo?.name || "Deleted",
+        roomType: roomInfo?.roomType || "",
+        checkIn: b.checkIn,
+        checkOut: b.checkOut,
+        status: b.status,
+        totalPrice: b.totalPrice,
+        createdAt: b.createdAt,
+      };
+    })
+  );
 
-  // --- Upcoming arrivals (confirmed, checkIn >= today) ---
+  // ---------- UPCOMING ARRIVALS ----------
   const upcomingArrivals = await Booking.find({
     checkIn: { $gte: todayStart },
-    status: "confirmed"
-  }).sort({ checkIn: 1 }).limit(10).lean();
-  const upcomingPopulated = await Promise.all(upcomingArrivals.map(async (b) => {
-    const room = await Room.findById(b.roomId).select("name").lean();
-    const user = await User.findById(b.userId).select("name").lean();
-    return { guestName: user?.name, roomName: room?.name, checkIn: b.checkIn };
-  }));
+    status: "confirmed",
+  })
+    .sort({ checkIn: 1 })
+    .limit(10)
+    .lean();
 
-  // --- Revenue by room type (this month vs last month) ---
+  const upcomingPopulated = await Promise.all(
+    upcomingArrivals.map(async (b) => {
+      const roomInfo = roomMap.get(b.roomId.toString());
+      const user = await User.findById(b.userId).select("name").lean();
+      return {
+        guestName: user?.name || "Unknown",
+        roomName: roomInfo?.name || "Deleted",
+        checkIn: b.checkIn,
+      };
+    })
+  );
+
+  // ---------- REVENUE BY ROOM TYPE (THIS MONTH vs LAST MONTH) ----------
   const firstDayThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
 
   const thisMonthBookings = await Booking.find({
     createdAt: { $gte: firstDayThisMonth },
-    status: { $ne: "cancelled" }
-  }).lean();
+    status: { $ne: "cancelled" },
+  })
+    .select("roomId totalPrice")
+    .lean();
+
   const lastMonthBookings = await Booking.find({
     createdAt: { $gte: firstDayLastMonth, $lte: lastDayLastMonth },
-    status: { $ne: "cancelled" }
-  }).lean();
+    status: { $ne: "cancelled" },
+  })
+    .select("roomId totalPrice")
+    .lean();
 
   const roomRevenueMap: Record<string, { thisMonth: number; lastMonth: number }> = {};
-  thisMonthBookings.forEach(b => {
-    const id = b.roomId.toString();
-    if (!roomRevenueMap[id]) roomRevenueMap[id] = { thisMonth: 0, lastMonth: 0 };
-    roomRevenueMap[id].thisMonth += b.totalPrice;
-  });
-  lastMonthBookings.forEach(b => {
-    const id = b.roomId.toString();
-    if (!roomRevenueMap[id]) roomRevenueMap[id] = { thisMonth: 0, lastMonth: 0 };
-    roomRevenueMap[id].lastMonth += b.totalPrice;
+
+  thisMonthBookings.forEach((b) => {
+    const roomId = b.roomId.toString();
+    if (!roomRevenueMap[roomId]) roomRevenueMap[roomId] = { thisMonth: 0, lastMonth: 0 };
+    roomRevenueMap[roomId].thisMonth += b.totalPrice;
   });
 
-  const roomRevenueArray = await Promise.all(
-    Object.entries(roomRevenueMap).map(async ([roomId, rev]) => {
-      const room = await Room.findById(roomId).select("name roomType").lean();
+  lastMonthBookings.forEach((b) => {
+    const roomId = b.roomId.toString();
+    if (!roomRevenueMap[roomId]) roomRevenueMap[roomId] = { thisMonth: 0, lastMonth: 0 };
+    roomRevenueMap[roomId].lastMonth += b.totalPrice;
+  });
+
+  const roomRevenueArray = Object.entries(roomRevenueMap).map(([roomId, rev]) => {
+    const roomInfo = roomMap.get(roomId);
+    return {
+      roomName: roomInfo?.name || "Unknown",
+      roomType: roomInfo?.roomType || "",
+      thisMonthRevenue: rev.thisMonth,
+      lastMonthRevenue: rev.lastMonth,
+    };
+  });
+
+  // ---------- ROOM AVAILABILITY GRID (NEXT 14 DAYS) ----------
+  const next14Days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(todayStart);
+    d.setDate(todayStart.getDate() + i);
+    return d;
+  });
+
+  const gridEnd = new Date(todayStart);
+  gridEnd.setDate(todayStart.getDate() + 14);
+
+  const roomAvailability = await Promise.all(
+    allRooms.map(async (room) => {
+      const roomId = room._id.toString();
+      const bookings = await Booking.find({
+        roomId,
+        status: { $ne: "cancelled" },
+        checkIn: { $lt: gridEnd },
+        checkOut: { $gt: todayStart },
+      })
+        .select("checkIn checkOut")
+        .lean();
+
+      const dayStatus = next14Days.map((day) => {
+        const dayStart = new Date(day);
+        const dayEnd = new Date(day.getTime() + 86400000);
+
+        if (room.status !== "active") return "inactive";
+        const isBooked = bookings.some(
+          (b) => new Date(b.checkIn) < dayEnd && new Date(b.checkOut) > dayStart
+        );
+        return isBooked ? "booked" : "available";
+      });
+
       return {
-        roomName: room?.name || "Unknown",
-        roomType: room?.roomType || "",
-        thisMonthRevenue: rev.thisMonth,
-        lastMonthRevenue: rev.lastMonth,
+        roomId,
+        roomName: room.name,
+        status: room.status,
+        dayStatus,
       };
     })
   );
 
-  // --- Room availability grid (next 14 days, includes checkout day) ---
-  const next14Days: Date[] = [];
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(todayStart);
-    d.setDate(todayStart.getDate() + i);
-    next14Days.push(d);
-  }
-  const roomAvailability = await Promise.all(allRooms.map(async (room) => {
-    const roomId = room._id.toString();
-    const bookings = await Booking.find({
-      roomId,
-      status: { $ne: "cancelled" },
-      checkIn: { $lt: new Date(todayStart.getTime() + 14 * 86400000) },
-      checkOut: { $gt: todayStart },
-    }).lean();
-    const dayStatus = next14Days.map(day => {
-      const dayStart = new Date(day);
-      const dayEnd = new Date(day.getTime() + 86400000);
-      const isBooked = bookings.some(b => b.checkIn < dayEnd && b.checkOut > dayStart);
-      if (room.status !== "active") return "inactive";
-      return isBooked ? "booked" : "available";
-    });
-    return { roomId, roomName: room.name, status: room.status, dayStatus };
-  }));
-
-  // --- Today Revenue breakdown by room ---
-  const todayRevenueBreakdown = todayCheckinsPopulated.reduce((acc, b) => {
+  // ---------- TODAY REVENUE BREAKDOWN (BY ROOM) ----------
+  const todayRevenueBreakdown: Record<string, number> = {};
+  todayCheckinsPopulated.forEach((b) => {
     const room = b.roomName || "Deleted";
-    if (!acc[room]) acc[room] = 0;
-    acc[room] += b.totalPrice;
-    return acc;
-  }, {} as Record<string, number>);
+    todayRevenueBreakdown[room] = (todayRevenueBreakdown[room] || 0) + b.totalPrice;
+  });
 
-  // --- All Reviews ---
+  // ---------- ALL REVIEWS ----------
   const totalReviews = await Review.countDocuments();
   const allReviewsList = await Review.find({}).sort({ createdAt: -1 }).limit(100).lean();
-  const allReviewsPopulated = await Promise.all(allReviewsList.map(async (r) => {
-    const user = await User.findById(r.userId).select("name email").lean();
-    const room = await Room.findById(r.roomId).select("name").lean();
-    return { ...r, user, roomName: room?.name || "Deleted" };
-  }));
+  const allReviewsPopulated = await Promise.all(
+    allReviewsList.map(async (r) => {
+      const [user, room] = await Promise.all([
+        User.findById(r.userId).select("name email").lean(),
+        Room.findById(r.roomId).select("name").lean(),
+      ]);
+      return { ...r, user, roomName: room?.name || "Deleted" };
+    })
+  );
 
   return NextResponse.json({
-    // original summary fields
     revenueData,
-    todayCheckins: todayCheckinsCount,
-    todayCheckouts: todayCheckoutsCount,
+    todayCheckins: todayCheckinsList.length,
+    todayCheckouts: todayCheckoutsList.length,
     todayRevenue,
-    todayNewUsers: todayNewUsersCount,
+    todayNewUsers: todayNewUsersList.length,
     todayReviews: todayReviewsList.length,
     totalBookings,
     totalRevenue,
@@ -322,10 +357,11 @@ export async function GET(req: Request) {
     roomRevenue: roomRevenueArray,
     roomAvailability,
     lastWeekReviews: await Review.countDocuments({
-      createdAt: { $gte: new Date(todayStart.getTime() - 7 * 86400000), $lt: todayStart }
+      createdAt: {
+        $gte: new Date(todayStart.getTime() - 7 * 86400000),
+        $lt: todayStart,
+      },
     }),
-
-    // detailed lists for popups
     todayCheckinsList: todayCheckinsPopulated,
     todayCheckoutsList: todayCheckoutsPopulated,
     todayNewUsersList,
@@ -333,6 +369,7 @@ export async function GET(req: Request) {
     pendingBookingsList: pendingPopulated,
     totalBookingsList: recentPopulated, // sample (last 10)
     totalRevenueBreakdown: todayRevenueBreakdown,
+    totalRevenueBreakdownAll, // ⬅️ Added for Total Revenue modal
     totalReviewsCount: totalReviews,
     allReviewsList: allReviewsPopulated,
   });

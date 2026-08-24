@@ -39,13 +39,11 @@ export default function AdminTopbar({
   const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
 
-  // Live clock update
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch real notifications (pending bookings + today check‑ins)
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -55,7 +53,6 @@ export default function AdminTopbar({
 
         const items: NotificationItem[] = [];
 
-        // Pending bookings as notifications
         if (data.recentBookings) {
           data.recentBookings
             .filter((b: any) => b.status === "pending")
@@ -70,7 +67,6 @@ export default function AdminTopbar({
             });
         }
 
-        // Today's check‑ins
         if (data.todayCheckins && data.todayCheckins > 0) {
           items.push({
             _id: "today-checkins",
@@ -89,7 +85,6 @@ export default function AdminTopbar({
     };
 
     fetchNotifications();
-    // Refresh every 60 seconds
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -104,51 +99,47 @@ export default function AdminTopbar({
   });
 
   return (
-    <header className="sticky top-0 z-20 bg-gradient-to-r from-white/80 via-white/70 to-teal-50/60 backdrop-blur-xl border-b border-teal-100/30 shadow-sm py-3 px-4 md:px-8 flex items-center justify-between">
+    <header className="sticky top-0 z-20 bg-gradient-to-r from-white/90 via-white/80 to-sky-50/70 backdrop-blur-xl border-b border-sky-100/40 shadow-sm py-3 px-4 md:px-8 flex items-center justify-between">
       {/* Decorative glow left edge */}
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-teal-400/60 via-emerald-400/40 to-teal-400/60 animate-pulse" />
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-sky-700 via-sky-500 to-sky-400 animate-pulse" />
 
-      {/* Left section: Sidebar toggle button + Brand + Clock */}
+      {/* Left section */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Sidebar toggle (mobile only) */}
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-2 rounded-lg text-teal-600 hover:bg-teal-50 transition"
+            className="lg:hidden p-2 rounded-lg text-sky-700 hover:bg-sky-50 transition"
             aria-label="Open sidebar"
           >
             <Menu size={20} />
           </button>
         )}
 
-        {/* Brand & animated anchor */}
         <motion.div
           animate={{ rotate: [0, 5, -5, 0] }}
           transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
           className="relative"
         >
-          <Anchor className="text-teal-600 w-5 h-5 sm:w-6 sm:h-6 drop-shadow-sm" />
-          <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-teal-400 rounded-full animate-ping" />
+          <Anchor className="text-sky-600 w-5 h-5 sm:w-6 sm:h-6 drop-shadow-sm" />
+          <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-sky-400 rounded-full animate-ping" />
         </motion.div>
 
-        {/* ✅ Mobile: Brand name upar, Admin neeche; Desktop: side by side */}
         <div className="flex flex-col sm:flex-row sm:items-baseline">
-          <span className="text-xs sm:text-lg font-bold bg-gradient-to-r from-teal-700 to-emerald-700 bg-clip-text text-transparent whitespace-nowrap">
-            Zain’s Serenity
+          <span className="text-xs sm:text-lg font-bold bg-gradient-to-r from-sky-800 to-sky-500 bg-clip-text text-transparent whitespace-nowrap">
+            Zain's Serenity
           </span>
-          <span className="text-[10px] sm:text-sm text-gray-400 sm:ml-1">· Admin</span>
+          <span className="text-[10px] sm:text-sm text-slate-400 sm:ml-1">· Admin</span>
         </div>
 
-        {/* Live clock */}
-        <div className="flex items-center gap-1 text-gray-500 border-l border-gray-200 pl-2 sm:pl-3 ml-1">
-          <Clock size={13} className="sm:w-4 sm:h-4 text-teal-500" />
+        <div className="flex items-center gap-1 text-slate-500 border-l border-slate-200 pl-2 sm:pl-3 ml-1">
+          <Clock size={13} className="sm:w-4 sm:h-4 text-sky-500" />
           <span className="text-[10px] sm:text-xs font-medium tabular-nums">
             {dateString} · {timeString}
           </span>
         </div>
       </div>
 
-      {/* Right: Notifications + Profile */}
+      {/* Right section */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Notifications */}
         <div className="relative">
@@ -156,15 +147,15 @@ export default function AdminTopbar({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setNotifOpen(!notifOpen)}
-            className="relative text-gray-500 hover:text-teal-600 p-1.5 sm:p-2 rounded-full bg-white/60 backdrop-blur-sm border border-white/80 transition hover:bg-teal-50"
+            className="relative text-slate-600 hover:text-sky-700 p-1.5 sm:p-2 rounded-full bg-white/70 backdrop-blur-sm border border-sky-100/60 transition hover:bg-sky-50"
           >
             <Bell size={18} className="sm:w-5 sm:h-5" />
             {unreadCount > 0 && (
               <>
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
-                <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-ping" />
+                <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-ping" />
               </>
             )}
           </motion.button>
@@ -176,18 +167,18 @@ export default function AdminTopbar({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 backdrop-blur-xl border border-white/70 rounded-2xl shadow-xl z-50 overflow-hidden"
+                className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 backdrop-blur-xl border border-sky-100/60 rounded-2xl shadow-xl shadow-sky-100/30 z-50 overflow-hidden"
               >
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <p className="text-sm font-semibold text-gray-800">Notifications</p>
+                <div className="px-4 py-3 border-b border-sky-100/50 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-slate-800">Notifications</p>
                   {unreadCount > 0 && (
-                    <span className="text-xs text-teal-600 font-medium">{unreadCount} new</span>
+                    <span className="text-xs text-sky-700 font-medium">{unreadCount} new</span>
                   )}
                 </div>
                 <div className="max-h-64 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="py-8 text-center text-sm text-gray-500">
-                      <Bell size={24} className="mx-auto mb-2 text-gray-300" />
+                    <div className="py-8 text-center text-sm text-slate-500">
+                      <Bell size={24} className="mx-auto mb-2 text-slate-300" />
                       All caught up! No new notifications.
                     </div>
                   ) : (
@@ -200,22 +191,22 @@ export default function AdminTopbar({
                             : `/admin`
                         }
                         onClick={() => setNotifOpen(false)}
-                        className="flex items-start gap-3 px-4 py-3 hover:bg-teal-50/50 transition border-b border-gray-50 last:border-none"
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-sky-50/60 transition border-b border-sky-100/30 last:border-none"
                       >
                         <div className="mt-0.5">
                           {notif.type === "booking_pending" ? (
                             <AlertCircle size={18} className="text-amber-500" />
                           ) : (
-                            <CalendarCheck size={18} className="text-blue-500" />
+                            <CalendarCheck size={18} className="text-sky-500" />
                           )}
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-gray-800">
+                          <p className="text-sm text-slate-800">
                             {notif.type === "booking_pending"
                               ? `${notif.guestName} pending booking`
                               : `Today: ${notif.guestName}`}
                           </p>
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-slate-500 mt-0.5">
                             {notif.type === "booking_pending"
                               ? `${notif.roomName} · check‑in ${new Date(
                                   notif.checkIn
@@ -223,7 +214,7 @@ export default function AdminTopbar({
                               : "Check‑ins today"}
                           </p>
                         </div>
-                        <ChevronRight size={16} className="text-gray-400 mt-1" />
+                        <ChevronRight size={16} className="text-slate-400 mt-1" />
                       </Link>
                     ))
                   )}
@@ -232,7 +223,7 @@ export default function AdminTopbar({
                   <Link
                     href="/admin/bookings"
                     onClick={() => setNotifOpen(false)}
-                    className="block text-center text-xs text-teal-600 font-medium py-2 border-t border-gray-100 hover:bg-teal-50/50 transition"
+                    className="block text-center text-xs text-sky-700 font-medium py-2 border-t border-sky-100/50 hover:bg-sky-50/60 transition"
                   >
                     View all bookings
                   </Link>
@@ -248,15 +239,15 @@ export default function AdminTopbar({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setProfileOpen(!profileOpen)}
-            className="flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm border border-white/80 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full hover:bg-white/90 transition shadow-sm"
+            className="flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm border border-sky-100/60 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full hover:bg-white/90 transition shadow-sm"
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-xs sm:text-sm shadow-inner">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-sky-600 to-sky-400 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-inner">
               {user?.name?.charAt(0) || user?.email?.charAt(0) || "A"}
             </div>
-            <span className="text-xs sm:text-sm text-gray-700 hidden sm:inline font-medium max-w-[80px] truncate">
+            <span className="text-xs sm:text-sm text-slate-700 hidden sm:inline font-medium max-w-[80px] truncate">
               {user?.name || user?.email?.split("@")[0]}
             </span>
-            <ChevronDown size={14} className="text-gray-500 hidden sm:block" />
+            <ChevronDown size={14} className="text-slate-500 hidden sm:block" />
           </motion.button>
 
           <AnimatePresence>
@@ -266,16 +257,16 @@ export default function AdminTopbar({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-48 sm:w-56 bg-white/95 backdrop-blur-xl border border-white/70 rounded-2xl shadow-xl z-50 overflow-hidden"
+                className="absolute right-0 mt-2 w-48 sm:w-56 bg-white/95 backdrop-blur-xl border border-sky-100/60 rounded-2xl shadow-xl shadow-sky-100/30 z-50 overflow-hidden"
               >
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                <div className="px-4 py-3 border-b border-sky-100/50">
+                  <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                 </div>
                 <Link
                   href="/admin"
                   onClick={() => setProfileOpen(false)}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition"
+                  className="flex items-center gap-3 w-full px-4 py-3 text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition"
                 >
                   <LayoutDashboard size={18} /> Dashboard
                 </Link>
@@ -284,7 +275,7 @@ export default function AdminTopbar({
                     signOut({ callbackUrl: "/" });
                     setProfileOpen(false);
                   }}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-500 transition"
+                  className="flex items-center gap-3 w-full px-4 py-3 text-slate-700 hover:bg-red-50 hover:text-red-500 transition"
                 >
                   <LogOut size={18} /> Logout
                 </button>

@@ -208,14 +208,14 @@ export default function EditRoom() {
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
-        <Loader2 className="animate-spin text-teal-600" size={40} />
+        <Loader2 className="animate-spin text-sky-600" size={40} />
       </div>
     );
   if (error && !form.name)
     return (
       <div className="text-center py-20">
         <p className="text-red-500">{error}</p>
-        <button onClick={() => router.back()} className="mt-4 text-teal-600 hover:underline">
+        <button onClick={() => router.back()} className="mt-4 text-sky-600 hover:underline">
           Go back
         </button>
       </div>
@@ -229,13 +229,13 @@ export default function EditRoom() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => router.back()}
-          className="text-gray-500 hover:text-teal-600 p-2 rounded-full bg-white/50 backdrop-blur-sm border border-white/60 transition"
+          className="text-slate-500 hover:text-sky-600 p-2 rounded-full bg-white/50 backdrop-blur-sm border border-slate-200 transition"
         >
           <ArrowLeft size={20} />
         </motion.button>
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Edit Room</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Update room details and images</p>
+          <h1 className="text-3xl font-bold text-sky-600">Edit Room</h1>
+          <p className="text-slate-500 text-sm mt-0.5">Update room details and images</p>
         </div>
       </div>
 
@@ -269,33 +269,33 @@ export default function EditRoom() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-md space-y-6"
+          className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-6 md:p-8 shadow-md shadow-slate-200/50 space-y-6"
         >
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <FileText size={22} className="text-teal-600" /> Basic Information
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <FileText size={22} className="text-cyan-600" /> Basic Information
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium flex items-center gap-1.5">
-                <BedDouble size={16} className="text-teal-500" /> Room Name
+              <label className="text-slate-600 text-sm font-medium flex items-center gap-1.5">
+                <BedDouble size={16} className="text-cyan-500" /> Room Name
               </label>
               <input
                 type="text"
                 required
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium flex items-center gap-1.5">
-                <DollarSign size={16} className="text-teal-500" /> Price per Night ($)
+              <label className="text-slate-600 text-sm font-medium flex items-center gap-1.5">
+                <DollarSign size={16} className="text-cyan-500" /> Price per Night ($)
               </label>
               <input
                 type="number"
                 required
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
@@ -303,11 +303,11 @@ export default function EditRoom() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-gray-600 text-sm font-medium">Description</label>
+            <label className="text-slate-600 text-sm font-medium">Description</label>
             <textarea
               required
               rows={4}
-              className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 resize-none transition-all"
+              className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 resize-none transition-all"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
@@ -315,8 +315,8 @@ export default function EditRoom() {
 
           {/* View Select – New field */}
           <div className="space-y-1.5">
-            <label className="text-gray-600 text-sm font-medium flex items-center gap-1.5">
-              <Eye size={16} className="text-teal-500" /> View
+            <label className="text-slate-600 text-sm font-medium flex items-center gap-1.5">
+              <Eye size={16} className="text-cyan-500" /> View
             </label>
             <select
               value={form.view}
@@ -328,7 +328,7 @@ export default function EditRoom() {
                   setForm({ ...form, view: val });
                 }
               }}
-              className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition"
+              className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
             >
               <option value="">None</option>
               {VIEW_OPTIONS.map((opt) => (
@@ -344,7 +344,7 @@ export default function EditRoom() {
                   placeholder="Enter custom view"
                   value={form.customView}
                   onChange={(e) => setForm({ ...form, customView: e.target.value })}
-                  className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all"
+                  className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
                 />
               </div>
             )}
@@ -352,11 +352,11 @@ export default function EditRoom() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium">Capacity</label>
+              <label className="text-slate-600 text-sm font-medium">Capacity</label>
               <select
                 value={form.capacity}
                 onChange={(e) => setForm({ ...form, capacity: e.target.value })}
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
               >
                 {[1,2,3,4,5,6].map(n => (
                   <option key={n} value={n}>{n} {n > 1 ? 'Guests' : 'Guest'}</option>
@@ -364,11 +364,11 @@ export default function EditRoom() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium">Room Type</label>
+              <label className="text-slate-600 text-sm font-medium">Room Type</label>
               <select
                 value={form.roomType}
                 onChange={(e) => setForm({ ...form, roomType: e.target.value })}
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
               >
                 <option value="standard">Standard</option>
                 <option value="deluxe">Deluxe</option>
@@ -377,11 +377,11 @@ export default function EditRoom() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium">Bed Type</label>
+              <label className="text-slate-600 text-sm font-medium">Bed Type</label>
               <select
                 value={form.bedType}
                 onChange={(e) => setForm({ ...form, bedType: e.target.value })}
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
               >
                 <option value="single">Single</option>
                 <option value="double">Double</option>
@@ -390,11 +390,11 @@ export default function EditRoom() {
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium">Room Size (sq. ft.)</label>
+              <label className="text-slate-600 text-sm font-medium">Room Size (sq. ft.)</label>
               <input
                 type="text"
                 placeholder="350"
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
                 value={form.size}
                 onChange={(e) => setForm({ ...form, size: e.target.value })}
               />
@@ -402,13 +402,13 @@ export default function EditRoom() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-gray-600 text-sm font-medium">Discount (% off)</label>
+            <label className="text-slate-600 text-sm font-medium">Discount (% off)</label>
             <input
               type="number"
               placeholder="10"
               min="0"
               max="100"
-              className="w-full md:w-48 bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all"
+              className="w-full md:w-48 bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition-all"
               value={form.discount}
               onChange={(e) => setForm({ ...form, discount: e.target.value })}
             />
@@ -420,18 +420,18 @@ export default function EditRoom() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-md space-y-6"
+          className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-6 md:p-8 shadow-md shadow-slate-200/50 space-y-6"
         >
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <Info size={22} className="text-teal-600" /> Settings
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <Info size={22} className="text-cyan-600" /> Settings
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
-              <label className="text-gray-600 text-sm font-medium">Status</label>
+              <label className="text-slate-600 text-sm font-medium">Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition"
+                className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -439,14 +439,14 @@ export default function EditRoom() {
               </select>
             </div>
             <div className="space-y-3">
-              <label className="text-gray-600 text-sm font-medium block">Quick Flags</label>
+              <label className="text-slate-600 text-sm font-medium block">Quick Flags</label>
               <div className="flex flex-wrap gap-4">
                 <motion.label
                   whileHover={{ scale: 1.02 }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition ${
                     form.isFeatured
                       ? "bg-yellow-50 border-yellow-300 text-yellow-700"
-                      : "bg-white border-gray-200 text-gray-500 hover:border-yellow-200"
+                      : "bg-white border-slate-200 text-slate-500 hover:border-yellow-200"
                   }`}
                 >
                   <input
@@ -455,15 +455,15 @@ export default function EditRoom() {
                     onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
                     className="sr-only"
                   />
-                  <Star size={16} className={form.isFeatured ? "text-yellow-500 fill-yellow-500" : "text-gray-400"} />
+                  <Star size={16} className={form.isFeatured ? "text-yellow-500 fill-yellow-500" : "text-slate-400"} />
                   Featured
                 </motion.label>
                 <motion.label
                   whileHover={{ scale: 1.02 }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl border cursor-pointer transition ${
                     form.isNewRoom
-                      ? "bg-blue-50 border-blue-300 text-blue-700"
-                      : "bg-white border-gray-200 text-gray-500 hover:border-blue-200"
+                      ? "bg-sky-50 border-sky-300 text-sky-700"
+                      : "bg-white border-slate-200 text-slate-500 hover:border-sky-200"
                   }`}
                 >
                   <input
@@ -472,7 +472,7 @@ export default function EditRoom() {
                     onChange={(e) => setForm({ ...form, isNewRoom: e.target.checked })}
                     className="sr-only"
                   />
-                  <Sparkles size={16} className={form.isNewRoom ? "text-blue-500" : "text-gray-400"} />
+                  <Sparkles size={16} className={form.isNewRoom ? "text-sky-500" : "text-slate-400"} />
                   Mark as New
                 </motion.label>
               </div>
@@ -485,22 +485,22 @@ export default function EditRoom() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-md space-y-6"
+          className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-6 md:p-8 shadow-md shadow-slate-200/50 space-y-6"
         >
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <ImageIcon size={22} className="text-teal-600" /> Images
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <ImageIcon size={22} className="text-cyan-600" /> Images
           </h2>
 
           {/* Existing Images */}
           {existingImages.length > 0 && (
             <div>
-              <label className="text-gray-600 text-sm font-medium mb-2 block">Current Images</label>
+              <label className="text-slate-600 text-sm font-medium mb-2 block">Current Images</label>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {existingImages.map((url, idx) => (
                   <motion.div
                     key={idx}
                     whileHover={{ scale: 1.02 }}
-                    className="relative rounded-xl overflow-hidden bg-gray-100 group shadow-sm"
+                    className="relative rounded-xl overflow-hidden bg-slate-100 group shadow-sm"
                   >
                     <img src={url} alt="Existing" className="w-full h-28 object-cover" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
@@ -515,7 +515,7 @@ export default function EditRoom() {
                       </motion.button>
                     </div>
                     {idx === 0 && (
-                      <span className="absolute bottom-1 left-1 bg-teal-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
+                      <span className="absolute bottom-1 left-1 bg-sky-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
                         Main
                       </span>
                     )}
@@ -527,13 +527,13 @@ export default function EditRoom() {
 
           {/* New Images Upload */}
           <div>
-            <label className="text-gray-600 text-sm font-medium mb-2 block">Add New Images</label>
+            <label className="text-slate-600 text-sm font-medium mb-2 block">Add New Images</label>
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={`relative flex flex-col items-center justify-center w-full h-36 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
-                dragOver ? "border-teal-500 bg-teal-50/50" : "border-gray-300 bg-white/50 hover:border-teal-400"
+                dragOver ? "border-sky-500 bg-sky-50/50" : "border-slate-300 bg-white/50 hover:border-sky-400"
               }`}
             >
               <input
@@ -544,9 +544,9 @@ export default function EditRoom() {
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={(e) => handleNewFiles(e.target.files)}
               />
-              <Upload className={`mb-1 ${dragOver ? "text-teal-600" : "text-gray-400"}`} size={24} />
-              <p className="text-sm text-gray-500">
-                <span className="text-teal-600 font-medium">Click to upload</span> or drag and drop
+              <Upload className={`mb-1 ${dragOver ? "text-sky-600" : "text-slate-400"}`} size={24} />
+              <p className="text-sm text-slate-500">
+                <span className="text-sky-600 font-medium">Click to upload</span> or drag and drop
               </p>
             </div>
             {newPreviews.length > 0 && (
@@ -556,7 +556,7 @@ export default function EditRoom() {
                     key={idx}
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
-                    className="relative rounded-xl overflow-hidden bg-gray-100 group shadow-sm"
+                    className="relative rounded-xl overflow-hidden bg-slate-100 group shadow-sm"
                   >
                     <img src={url} alt="New" className="w-full h-28 object-cover" />
                     <motion.button
@@ -580,17 +580,17 @@ export default function EditRoom() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-md space-y-4"
+          className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-6 md:p-8 shadow-md shadow-slate-200/50 space-y-4"
         >
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <List size={22} className="text-teal-600" /> Amenities
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <List size={22} className="text-cyan-600" /> Amenities
           </h2>
           <input
             type="text"
             placeholder="Search amenities..."
             value={searchAmenity}
             onChange={(e) => setSearchAmenity(e.target.value)}
-            className="w-full bg-white/80 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition"
+            className="w-full bg-white/80 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
           />
           <div className="flex flex-wrap gap-2">
             {filteredAmenities.map((amenity) => (
@@ -602,8 +602,8 @@ export default function EditRoom() {
                 onClick={() => toggleAmenity(amenity)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${
                   form.amenities.includes(amenity)
-                    ? "bg-teal-500 text-white border-teal-500 shadow-sm"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-teal-300"
+                    ? "bg-sky-600 text-white border-sky-600 shadow-sm"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-sky-300"
                 }`}
               >
                 {form.amenities.includes(amenity) ? "✓ " : "+ "}{amenity}
@@ -614,7 +614,7 @@ export default function EditRoom() {
             <input
               type="text"
               placeholder="Add custom amenity..."
-              className="flex-1 bg-white/80 border border-gray-200 rounded-xl px-4 py-2 text-sm"
+              className="flex-1 bg-white/80 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -638,7 +638,7 @@ export default function EditRoom() {
                   }
                 }
               }}
-              className="bg-teal-100 text-teal-700 px-3 py-2 rounded-xl hover:bg-teal-200 transition text-sm font-medium"
+              className="bg-cyan-100 text-cyan-700 px-3 py-2 rounded-xl hover:bg-cyan-200 transition text-sm font-medium"
             >
               <Plus size={16} />
             </button>
@@ -650,10 +650,10 @@ export default function EditRoom() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="bg-teal-50/50 rounded-xl p-5 space-y-2 border border-teal-100"
+          className="bg-sky-50/50 rounded-xl p-5 space-y-2 border border-sky-100"
         >
-          <h3 className="font-semibold text-gray-800 text-sm">Room Summary</h3>
-          <ul className="text-sm text-gray-600 space-y-1">
+          <h3 className="font-semibold text-slate-800 text-sm">Room Summary</h3>
+          <ul className="text-sm text-slate-600 space-y-1">
             <li><span className="font-medium">Name:</span> {form.name || "—"}</li>
             <li><span className="font-medium">Type:</span> {form.roomType} | {form.bedType}</li>
             <li><span className="font-medium">Price:</span> ${form.price || 0}/night</li>
@@ -672,7 +672,7 @@ export default function EditRoom() {
           <button
             type="submit"
             disabled={uploading}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-slate-300/50 hover:shadow-xl transition disabled:opacity-50"
           >
             {uploading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
             {uploading ? "Updating Room..." : "Update Room"}

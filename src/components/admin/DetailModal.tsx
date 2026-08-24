@@ -22,14 +22,14 @@ export default function DetailModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+          {/* Backdrop - lighter neutral */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -39,35 +39,40 @@ export default function DetailModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden"
+            className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] sm:max-h-[85vh] flex flex-col overflow-hidden border border-sky-100"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-teal-600 to-teal-500 text-white">
-              <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+            {/* Header - BRIGHT sky/cyan gradient */}
+            <div className="flex-shrink-0 flex items-center justify-between px-5 sm:px-6 py-4 bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-lg">
+              <h2 className="text-lg font-bold tracking-tight truncate pr-2">
+                {title}
+              </h2>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-white/20 transition-colors"
+                className="flex-shrink-0 p-1.5 rounded-xl hover:bg-white/20 transition-colors active:scale-90"
+                aria-label="Close modal"
               >
                 <X size={20} />
               </button>
             </div>
 
-            {/* Content */}
-            <div className="overflow-auto flex-1 p-6">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-6">
               {data.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                <div className="flex flex-col items-center justify-center py-16 text-slate-400">
                   <p className="text-lg font-medium">No data available.</p>
                 </div>
               ) : (
-                <div className="border border-gray-200/60 rounded-xl overflow-hidden">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50 sticky top-0">
-                      <tr>
+                /* Horizontal scroll wrapper */
+                <div className="overflow-x-auto rounded-2xl border border-sky-100 shadow-sm">
+                  {/* Table with min-width for mobile horizontal scroll */}
+                  <table className="min-w-[600px] w-full text-sm">
+                    <thead className="bg-gradient-to-r from-sky-50 to-cyan-50 sticky top-0 z-10">
+                      <tr className="border-b border-sky-100">
                         {columns.map((col) => (
                           <th
                             key={col.key}
-                            className="text-left px-5 py-3 font-semibold text-gray-600 whitespace-nowrap"
+                            className="text-left px-4 sm:px-5 py-3 font-semibold text-slate-600 whitespace-nowrap"
                           >
                             {col.label}
                           </th>
@@ -81,10 +86,13 @@ export default function DetailModal({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.02 }}
                           key={idx}
-                          className="border-t border-gray-100 even:bg-gray-50/30 hover:bg-teal-50/30 transition-colors"
+                          className="border-t border-sky-100 even:bg-sky-50/40 hover:bg-sky-50/60 transition-colors"
                         >
                           {columns.map((col) => (
-                            <td key={col.key} className="px-5 py-3 text-gray-700 whitespace-nowrap">
+                            <td
+                              key={col.key}
+                              className="px-4 sm:px-5 py-3 text-slate-700 whitespace-nowrap"
+                            >
                               {renderCell ? renderCell(item, col.key) : item[col.key]}
                             </td>
                           ))}

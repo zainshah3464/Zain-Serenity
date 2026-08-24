@@ -37,24 +37,30 @@ export default function AdminSidebar({
   const [internalOpen, setInternalOpen] = useState(false);
   const pathname = usePathname();
 
-  // Use external state if provided, otherwise fall back to internal
   const isOpen = parentIsOpen !== undefined ? parentIsOpen : internalOpen;
   const closeSidebar = parentOnClose || (() => setInternalOpen(false));
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-white/80 backdrop-blur-xl border-r border-teal-100/60 shadow-sm text-gray-700">
+    <div className="flex flex-col h-full bg-gradient-to-b from-white/90 to-sky-50/80 backdrop-blur-xl border-r border-sky-100/40 shadow-xl shadow-sky-100/30 text-slate-700">
+      {/* Decorative top gradient */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-700 via-sky-500 to-sky-400 rounded-b-full" />
+
       {/* Header */}
-      <div className="p-5 flex items-center justify-between border-b border-teal-50">
+      <div className="p-5 flex items-center justify-between border-b border-sky-100/50">
         <Link href="/admin" className="flex items-center gap-2 group" onClick={closeSidebar}>
-          <motion.div whileHover={{ rotate: 12 }} className="text-teal-600">
+          <motion.div
+            whileHover={{ rotate: 12 }}
+            className="relative text-sky-600"
+          >
             <Anchor className="w-6 h-6" />
+            <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-sky-400 rounded-full animate-ping" />
           </motion.div>
-          <span className="text-xl font-bold bg-gradient-to-r from-teal-700 to-emerald-700 bg-clip-text text-transparent">
-            Zain’s Serenity
+          <span className="text-xl font-bold bg-gradient-to-r from-sky-800 to-sky-500 bg-clip-text text-transparent">
+            Zain's Serenity
           </span>
         </Link>
         <button
-          className="lg:hidden text-gray-400 hover:text-teal-600 transition"
+          className="lg:hidden text-slate-400 hover:text-sky-600 transition"
           onClick={closeSidebar}
         >
           <X size={24} />
@@ -72,13 +78,15 @@ export default function AdminSidebar({
               onClick={closeSidebar}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative ${
                 active
-                  ? "bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-teal-700 font-semibold"
-                  : "hover:bg-teal-50/50 text-gray-600 hover:text-teal-600"
+                  ? "bg-gradient-to-r from-sky-600/10 to-sky-400/10 text-sky-800 font-semibold shadow-inner"
+                  : "hover:bg-sky-50/60 text-slate-600 hover:text-sky-700"
               }`}
             >
               <motion.div
                 whileHover={{ scale: 1.1 }}
-                className={`p-1 rounded-lg ${active ? "bg-teal-100" : "bg-transparent"}`}
+                className={`p-1 rounded-lg transition-colors ${
+                  active ? "bg-sky-100" : "bg-transparent group-hover:bg-sky-50"
+                }`}
               >
                 <item.icon size={20} />
               </motion.div>
@@ -86,7 +94,7 @@ export default function AdminSidebar({
               {active && (
                 <motion.div
                   layoutId="adminActive"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-teal-500 rounded-r-full"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-sky-600 to-sky-400 rounded-r-full"
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 />
               )}
@@ -96,17 +104,17 @@ export default function AdminSidebar({
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-teal-100/50 space-y-2">
+      <div className="p-4 border-t border-sky-100/50 space-y-2">
         <Link
           href="/"
-          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-all"
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-slate-600 hover:bg-sky-50 hover:text-sky-700 transition-all"
         >
           <Home size={18} />
           <span className="text-sm">Go to Site</span>
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-500 transition-all"
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-500 transition-all"
         >
           <LogOut size={18} />
           <span className="text-sm">Logout</span>
@@ -122,9 +130,9 @@ export default function AdminSidebar({
         {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
+            animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-40 lg:hidden backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-900 z-40 lg:hidden backdrop-blur-sm"
             onClick={closeSidebar}
           />
         )}
@@ -144,8 +152,6 @@ export default function AdminSidebar({
       <aside className="hidden lg:flex w-64 flex-shrink-0 h-screen sticky top-0">
         <SidebarContent />
       </aside>
-
-      {/* ❌ Removed the floating mobile menu button */}
     </>
   );
 }
