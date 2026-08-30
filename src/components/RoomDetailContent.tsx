@@ -1,11 +1,11 @@
 "use client";
-import { useState, useMemo, Suspense, useEffect } from "react"; // ← useEffect added
+import { useState, useMemo, Suspense, useEffect, useRef } from "react"; // ← useRef added
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import ReviewForm from "@/components/ReviewForm";
 import Room3DViewer from "@/components/Room3DViewer";
-import { trackViewItem } from "@/lib/ga4"; // ← GA4 tracking import
+import { trackViewItem } from "@/lib/ga4";
 import {
   Star, Check, ChevronRight, ChevronLeft,
   Users, BedDouble, Ruler, Wifi, Tv, Wind, Mountain, Coffee,
@@ -69,10 +69,8 @@ function BookedCalendar({ bookings }: { bookings: BookingData[] }) {
     bookings.forEach((b) => {
       const start = new Date(b.checkIn);
       const end = new Date(b.checkOut);
-      // Normalize to local midnight
       const current = new Date(start.getFullYear(), start.getMonth(), start.getDate());
       const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-      // ✅ include check‑out day
       while (current <= endDate) {
         const localStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
         set.add(localStr);
@@ -180,7 +178,18 @@ export default function RoomDetailContent({
 }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [readMoreOpen, setReadMoreOpen] = useState(false);
   const galleryImages = room.images?.length ? room.images : [room.image];
+
+  // Ref to detect if description is truncated
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const [isDescriptionLong, setIsDescriptionLong] = useState(false);
+
+  useEffect(() => {
+    if (descriptionRef.current) {
+      setIsDescriptionLong(descriptionRef.current.scrollHeight > descriptionRef.current.clientHeight);
+    }
+  }, [room.description]);
 
   // GA4 Tracking: view_item event on room detail view
   useEffect(() => {
@@ -205,6 +214,17 @@ export default function RoomDetailContent({
     "Mountain View": Mountain,
     "Coffee Maker": Coffee,
     "Free Parking": Shield,
+  };
+
+  // Navigation handlers for main image
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedImage((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedImage((prev) => (prev + 1) % galleryImages.length);
   };
 
   return (
@@ -237,16 +257,33 @@ export default function RoomDetailContent({
               >
                 <Maximize2 size={18} className="text-gray-700" />
               </motion.div>
+
+              {/* Image navigation arrows (transparent) */}
+              <button
+                onClick={prevImage}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 backdrop-blur-sm transition"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 backdrop-blur-sm transition"
+                aria-label="Next image"
+              >
+                <ChevronRight size={24} />
+              </button>
             </div>
 
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+            {/* Horizontal scrollable thumbnail row */}
+            <div className="flex overflow-x-auto gap-3 py-2 -mx-1 px-1">
               {galleryImages.map((img, idx) => (
                 <motion.div
                   key={idx}
                   whileHover={{ scale: 1.04, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedImage(idx)}
-                  className={`relative h-20 md:h-24 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${
+                  className={`relative flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${
                     selectedImage === idx
                       ? "border-teal-500 shadow-lg shadow-teal-100"
                       : "border-white/60 hover:border-teal-300"
@@ -257,7 +294,7 @@ export default function RoomDetailContent({
                     alt={`${room.name} ${idx + 1}`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 25vw, 10vw"
+                    sizes="(max-width: 768px) 80px, 96px"
                   />
                   {idx === 0 && (
                     <span className="absolute top-1 left-1 bg-teal-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
@@ -320,7 +357,30 @@ export default function RoomDetailContent({
                 </span>
               )}
             </div>
-            <p className="text-gray-600 mt-5 leading-relaxed">{room.description}</p>
+
+            {/* Description with preserved formatting and Read More */}
+            <div className="mt-5">
+              <div
+                ref={descriptionRef}
+                className="relative overflow-hidden"
+                style={{ maxHeight: "6rem" }} // fixed height ~3 lines
+              >
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                  {room.description}
+                </p>
+                {isDescriptionLong && (
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent pointer-events-none" />
+                )}
+              </div>
+              {isDescriptionLong && (
+                <button
+                  onClick={() => setReadMoreOpen(true)}
+                  className="mt-2 text-teal-600 hover:text-teal-800 text-sm font-semibold flex items-center gap-1"
+                >
+                  Read More <ChevronRight size={16} />
+                </button>
+              )}
+            </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
               {room.capacity && (
@@ -500,7 +560,6 @@ export default function RoomDetailContent({
               className="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Plain img to preserve actual aspect ratio */}
               <img
                 src={galleryImages[selectedImage]}
                 alt={room.name}
@@ -512,6 +571,41 @@ export default function RoomDetailContent({
               >
                 <X size={24} />
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* READ MORE DESCRIPTION MODAL */}
+      <AnimatePresence>
+        {readMoreOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setReadMoreOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 md:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-bold text-gray-800">Room Description</h3>
+                <button
+                  onClick={() => setReadMoreOpen(false)}
+                  className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {room.description}
+              </p>
             </motion.div>
           </motion.div>
         )}

@@ -132,47 +132,6 @@ function AnimatedCounter({
 }
 
 /* ────────────────────────────────────
-   Floating decorations – opacity reduced back to original
-   ──────────────────────────────────── */
-function FloatingDecorations() {
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-      <motion.div
-        className="absolute top-[8%] left-[4%] w-20 h-20 md:w-28 md:h-28 rounded-full bg-teal-500/30 blur-3xl"
-        animate={{ scale: [1, 1.4, 1], x: [0, 20, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[15%] right-[5%] w-24 h-24 md:w-36 md:h-36 rounded-full bg-emerald-400/30 blur-3xl"
-        animate={{ scale: [1, 1.3, 1], y: [0, -20, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[40%] right-[20%] w-14 h-14 md:w-20 md:h-20 rounded-full bg-amber-300/30 blur-2xl"
-        animate={{ scale: [1, 1.6, 1], opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65%] h-[65%] border border-teal-400/25 rounded-full"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute top-[18%] right-[12%] w-1.5 h-1.5 bg-teal-500/50 rounded-full"
-        animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
-      />
-      <motion.div
-        className="absolute bottom-[25%] left-[10%] w-2 h-2 bg-emerald-500/50 rounded-full"
-        animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
-        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-      />
-    </div>
-  );
-}
-
-/* ────────────────────────────────────
    Progress bar – enhanced with glowing dot
    ──────────────────────────────────── */
 function ProgressBar({
@@ -313,8 +272,7 @@ export default function WhyChooseUs() {
       style={{ height: `${phases.length * 100}vh` }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-gradient-to-br from-white via-teal-50/40 to-white">
-        <FloatingDecorations />
-
+        {/* FloatingDecorations component removed */}
         <PhaseIndicators
           active={activePhase}
           total={phases.length}
