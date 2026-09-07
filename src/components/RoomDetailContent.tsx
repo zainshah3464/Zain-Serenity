@@ -246,15 +246,15 @@ export default function RoomDetailContent({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-teal-50/20 to-white pb-10 md:pb-16 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 md:py-12 space-y-12 md:space-y-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 md:py-12 space-y-12 md:space-y-16 w-full">
         {/* ───── GALLERY + INFO GRID ───── */}
-        <div className="grid lg:grid-cols-5 gap-6 md:gap-8">
+        <div className="grid lg:grid-cols-5 gap-6 md:gap-8 w-full">
           {/* LEFT: Images */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="lg:col-span-3 space-y-4"
+            className="lg:col-span-3 space-y-4 w-full min-w-0"
           >
             <div
               className="relative w-full h-[240px] sm:h-[320px] md:h-[450px] rounded-2xl overflow-hidden shadow-2xl border border-white/60 cursor-zoom-in group"
@@ -307,10 +307,10 @@ export default function RoomDetailContent({
             </div>
 
             {/* Horizontal scrollable thumbnail row with hint */}
-            <div className="relative group">
+            <div className="relative group w-full overflow-hidden">
               <div
-                className="flex overflow-x-auto gap-2 sm:gap-3 py-2 px-1 scrollbar-thin scrollbar-thumb-teal-200 scrollbar-track-transparent"
-                style={{ scrollbarWidth: "thin" }}
+                className="flex overflow-x-auto gap-2 sm:gap-3 py-2 px-1 scrollbar-thin scrollbar-thumb-teal-200 scrollbar-track-transparent touch-pan-x"
+                style={{ scrollbarWidth: "thin", WebkitOverflowScrolling: "touch" }}
               >
                 {galleryImages.map((img, idx) => (
                   <motion.div
@@ -331,6 +331,7 @@ export default function RoomDetailContent({
                       className="object-cover"
                       sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
                       quality={80}
+                      loading="lazy"
                     />
                     {idx === 0 && (
                       <span className="absolute top-1 left-1 bg-teal-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
@@ -352,7 +353,7 @@ export default function RoomDetailContent({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl flex flex-col"
+            className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl flex flex-col w-full min-w-0"
           >
             <div className="flex flex-wrap items-center gap-2 mb-2">
               {room.isNew && (
@@ -404,7 +405,7 @@ export default function RoomDetailContent({
               <div
                 ref={descriptionRef}
                 className="relative overflow-hidden"
-                style={{ maxHeight: "6rem" }} // fixed height ~3 lines
+                style={{ maxHeight: "6rem" }}
               >
                 <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm sm:text-base">
                   {room.description}
@@ -473,11 +474,11 @@ export default function RoomDetailContent({
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="mt-auto pt-4 sm:pt-6"
+              className="mt-auto pt-4 sm:pt-6 w-full"
             >
               <Link
                 href={`/booking?roomId=${room._id}&roomName=${encodeURIComponent(room.name)}&price=${room.price}&image=${encodeURIComponent(room.image)}&rating=${avgRating || 0}`}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all min-h-[48px] whitespace-nowrap"
               >
                 Book Now <ChevronRight size={20} />
               </Link>
@@ -491,16 +492,16 @@ export default function RoomDetailContent({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="grid lg:grid-cols-2 gap-6 md:gap-8"
+          className="grid lg:grid-cols-2 gap-6 md:gap-8 w-full"
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full min-w-0">
             <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center gap-2">
               <CalendarDays className="text-teal-600" /> Availability
             </h2>
             <BookedCalendar bookings={upcomingBookings} />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col w-full min-w-0">
             <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center gap-2">
               <Box className="text-teal-600" /> 3D Room View
             </h2>
@@ -521,7 +522,7 @@ export default function RoomDetailContent({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/50 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-8 shadow-xl"
+          className="bg-white/50 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-8 shadow-xl w-full"
         >
           <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-2">
             <Star className="text-yellow-500 fill-yellow-400" /> Guest Reviews
@@ -611,6 +612,7 @@ export default function RoomDetailContent({
                   exit={{ opacity: 0, scale: 1.05 }}
                   transition={{ duration: 0.3 }}
                   className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg"
+                  loading="lazy"
                 />
               </AnimatePresence>
 
