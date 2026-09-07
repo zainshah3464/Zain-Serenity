@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, Suspense, useEffect, useRef } from "react"; // ← useRef added
+import { useState, useMemo, Suspense, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,6 +10,7 @@ import {
   Star, Check, ChevronRight, ChevronLeft,
   Users, BedDouble, Ruler, Wifi, Tv, Wind, Mountain, Coffee,
   Shield, Maximize2, CalendarDays, Sparkles, Info, X, Box,
+  type LucideIcon,
 } from "lucide-react";
 
 // ---------- TYPES ----------
@@ -100,13 +101,13 @@ function BookedCalendar({ bookings }: { bookings: BookingData[] }) {
     <div className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-4 sm:p-6 shadow-lg h-full flex flex-col">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <button onClick={prevMonth} className="text-teal-600 hover:text-teal-800 p-1 sm:p-1.5 rounded-full hover:bg-teal-50 transition">
-          <ChevronLeft size={18} className="sm:size-20" />
+          <ChevronLeft size={18} />
         </button>
         <h4 className="text-base sm:text-lg font-bold text-gray-800">
           {viewDate.toLocaleString("default", { month: "long", year: "numeric" })}
         </h4>
         <button onClick={nextMonth} className="text-teal-600 hover:text-teal-800 p-1 sm:p-1.5 rounded-full hover:bg-teal-50 transition">
-          <ChevronRight size={18} className="sm:size-20" />
+          <ChevronRight size={18} />
         </button>
       </div>
       <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-center text-[10px] sm:text-xs flex-1">
@@ -207,7 +208,7 @@ export default function RoomDetailContent({
       : null;
   const reviewCount = reviews.length;
 
-  const featuredAmenitiesIcons: Record<string, any> = {
+  const featuredAmenitiesIcons: Record<string, LucideIcon> = {
     WiFi: Wifi,
     TV: Tv,
     "Air Conditioning": Wind,
@@ -217,21 +218,37 @@ export default function RoomDetailContent({
   };
 
   // Navigation handlers for main image
-  const prevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const prevImage = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setSelectedImage((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
-  };
+  }, [galleryImages.length]);
 
-  const nextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const nextImage = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setSelectedImage((prev) => (prev + 1) % galleryImages.length);
-  };
+  }, [galleryImages.length]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setLightboxOpen(false);
+      } else if (e.key === "ArrowLeft") {
+        setSelectedImage((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+      } else if (e.key === "ArrowRight") {
+        setSelectedImage((prev) => (prev + 1) % galleryImages.length);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen, galleryImages.length]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-teal-50/20 to-white pb-16">
-      <div className="max-w-7xl mx-auto px-4 py-12 space-y-16">
+    <div className="min-h-screen bg-gradient-to-br from-white via-teal-50/20 to-white pb-10 md:pb-16 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 md:py-12 space-y-12 md:space-y-16">
         {/* ───── GALLERY + INFO GRID ───── */}
-        <div className="grid lg:grid-cols-5 gap-8">
+        <div className="grid lg:grid-cols-5 gap-6 md:gap-8">
           {/* LEFT: Images */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -240,17 +257,31 @@ export default function RoomDetailContent({
             className="lg:col-span-3 space-y-4"
           >
             <div
-              className="relative w-full h-[300px] md:h-[450px] rounded-2xl overflow-hidden shadow-2xl border border-white/60 cursor-zoom-in group"
+              className="relative w-full h-[240px] sm:h-[320px] md:h-[450px] rounded-2xl overflow-hidden shadow-2xl border border-white/60 cursor-zoom-in group"
               onClick={() => setLightboxOpen(true)}
             >
-              <Image
-                src={galleryImages[selectedImage]}
-                alt={room.name}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+              {/* AnimatePresence for smooth crossfade */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedImage}
+                  initial={{ opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={galleryImages[selectedImage]}
+                    alt={room.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority
+                    quality={90}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 50vw"
+                  />
+                </motion.div>
+              </AnimatePresence>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="absolute top-4 right-4 bg-white/60 backdrop-blur-sm p-2 rounded-full shadow"
@@ -264,45 +295,55 @@ export default function RoomDetailContent({
                 className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 backdrop-blur-sm transition"
                 aria-label="Previous image"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={20} />
               </button>
               <button
                 onClick={nextImage}
                 className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 backdrop-blur-sm transition"
                 aria-label="Next image"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={20} />
               </button>
             </div>
 
-            {/* Horizontal scrollable thumbnail row */}
-            <div className="flex overflow-x-auto gap-3 py-2 -mx-1 px-1">
-              {galleryImages.map((img, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ scale: 1.04, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedImage(idx)}
-                  className={`relative flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${
-                    selectedImage === idx
-                      ? "border-teal-500 shadow-lg shadow-teal-100"
-                      : "border-white/60 hover:border-teal-300"
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${room.name} ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 80px, 96px"
-                  />
-                  {idx === 0 && (
-                    <span className="absolute top-1 left-1 bg-teal-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                      Main
-                    </span>
-                  )}
-                </motion.div>
-              ))}
+            {/* Horizontal scrollable thumbnail row with hint */}
+            <div className="relative group">
+              <div
+                className="flex overflow-x-auto gap-2 sm:gap-3 py-2 px-1 scrollbar-thin scrollbar-thumb-teal-200 scrollbar-track-transparent"
+                style={{ scrollbarWidth: "thin" }}
+              >
+                {galleryImages.map((img, idx) => (
+                  <motion.div
+                    key={idx}
+                    whileHover={{ scale: 1.04, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${
+                      selectedImage === idx
+                        ? "border-teal-500 shadow-lg shadow-teal-100"
+                        : "border-white/60 hover:border-teal-300"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${room.name} ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
+                      quality={80}
+                    />
+                    {idx === 0 && (
+                      <span className="absolute top-1 left-1 bg-teal-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                        Main
+                      </span>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+              {/* Scroll hint - visible on mobile/touch devices */}
+              <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-md pointer-events-none">
+                <ChevronRight size={18} className="text-teal-600" />
+              </div>
             </div>
           </motion.div>
 
@@ -311,7 +352,7 @@ export default function RoomDetailContent({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col"
+            className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl flex flex-col"
           >
             <div className="flex flex-wrap items-center gap-2 mb-2">
               {room.isNew && (
@@ -325,7 +366,7 @@ export default function RoomDetailContent({
                 </span>
               )}
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800 leading-tight">
               {room.name}
             </h1>
             {avgRating && (
@@ -334,7 +375,7 @@ export default function RoomDetailContent({
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      size={18}
+                      size={16}
                       className={
                         star <= Math.round(Number(avgRating))
                           ? "text-yellow-400 fill-yellow-400"
@@ -349,8 +390,8 @@ export default function RoomDetailContent({
               </div>
             )}
             <div className="mt-4 flex items-baseline gap-2">
-              <p className="text-4xl font-bold text-teal-600">${room.price}</p>
-              <span className="text-lg text-gray-400 font-normal">/ night</span>
+              <p className="text-3xl sm:text-4xl font-bold text-teal-600">${room.price}</p>
+              <span className="text-base sm:text-lg text-gray-400 font-normal">/ night</span>
               {room.discount && room.discount > 0 && (
                 <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full ml-2">
                   {room.discount}% OFF
@@ -365,7 +406,7 @@ export default function RoomDetailContent({
                 className="relative overflow-hidden"
                 style={{ maxHeight: "6rem" }} // fixed height ~3 lines
               >
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm sm:text-base">
                   {room.description}
                 </p>
                 {isDescriptionLong && (
@@ -382,28 +423,28 @@ export default function RoomDetailContent({
               )}
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6 grid grid-cols-2 gap-2 sm:gap-3">
               {room.capacity && (
-                <div className="flex items-center gap-2 text-sm text-gray-700 bg-teal-50/50 rounded-xl p-3">
-                  <Users size={18} className="text-teal-600" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 bg-teal-50/50 rounded-xl p-2.5 sm:p-3">
+                  <Users size={16} className="text-teal-600 flex-shrink-0" />
                   <span>Up to {room.capacity} guests</span>
                 </div>
               )}
               {room.bedType && (
-                <div className="flex items-center gap-2 text-sm text-gray-700 bg-teal-50/50 rounded-xl p-3">
-                  <BedDouble size={18} className="text-teal-600" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 bg-teal-50/50 rounded-xl p-2.5 sm:p-3">
+                  <BedDouble size={16} className="text-teal-600 flex-shrink-0" />
                   <span>{room.bedType}</span>
                 </div>
               )}
               {room.size && (
-                <div className="flex items-center gap-2 text-sm text-gray-700 bg-teal-50/50 rounded-xl p-3">
-                  <Ruler size={18} className="text-teal-600" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 bg-teal-50/50 rounded-xl p-2.5 sm:p-3">
+                  <Ruler size={16} className="text-teal-600 flex-shrink-0" />
                   <span>{room.size} sq. ft.</span>
                 </div>
               )}
               {room.roomType && (
-                <div className="flex items-center gap-2 text-sm text-gray-700 bg-teal-50/50 rounded-xl p-3">
-                  <Info size={18} className="text-teal-600" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 bg-teal-50/50 rounded-xl p-2.5 sm:p-3">
+                  <Info size={16} className="text-teal-600 flex-shrink-0" />
                   <span>{room.roomType}</span>
                 </div>
               )}
@@ -411,7 +452,7 @@ export default function RoomDetailContent({
 
             {room.amenities && room.amenities.length > 0 && (
               <div className="mt-6">
-                <h3 className="font-semibold text-gray-800 mb-3">Amenities</h3>
+                <h3 className="font-semibold text-gray-800 mb-3 text-sm sm:text-base">Amenities</h3>
                 <div className="flex flex-wrap gap-2">
                   {room.amenities.map((a) => {
                     const Icon = featuredAmenitiesIcons[a] || Check;
@@ -419,7 +460,7 @@ export default function RoomDetailContent({
                       <motion.span
                         key={a}
                         whileHover={{ scale: 1.05 }}
-                        className="inline-flex items-center gap-1.5 bg-white/80 border border-gray-200 px-3 py-1.5 rounded-full text-xs font-medium text-gray-700"
+                        className="inline-flex items-center gap-1.5 bg-white/80 border border-gray-200 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium text-gray-700"
                       >
                         <Icon size={14} className="text-teal-600" /> {a}
                       </motion.span>
@@ -432,11 +473,11 @@ export default function RoomDetailContent({
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="mt-auto pt-6"
+              className="mt-auto pt-4 sm:pt-6"
             >
               <Link
                 href={`/booking?roomId=${room._id}&roomName=${encodeURIComponent(room.name)}&price=${room.price}&image=${encodeURIComponent(room.image)}&rating=${avgRating || 0}`}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
               >
                 Book Now <ChevronRight size={20} />
               </Link>
@@ -450,20 +491,20 @@ export default function RoomDetailContent({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="grid lg:grid-cols-2 gap-8"
+          className="grid lg:grid-cols-2 gap-6 md:gap-8"
         >
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center gap-2">
               <CalendarDays className="text-teal-600" /> Availability
             </h2>
             <BookedCalendar bookings={upcomingBookings} />
           </div>
 
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center gap-2">
               <Box className="text-teal-600" /> 3D Room View
             </h2>
-            <div className="relative flex-1 min-h-[400px] rounded-3xl overflow-hidden border border-white/60 shadow-2xl bg-gradient-to-br from-teal-50/30 to-white group">
+            <div className="relative flex-1 min-h-[300px] sm:min-h-[400px] rounded-3xl overflow-hidden border border-white/60 shadow-2xl bg-gradient-to-br from-teal-50/30 to-white group">
               <Suspense fallback={<ThreeDPlaceholder />}>
                 <Room3DViewer />
               </Suspense>
@@ -480,9 +521,9 @@ export default function RoomDetailContent({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/50 backdrop-blur-xl border border-white/80 rounded-3xl p-8 shadow-xl"
+          className="bg-white/50 backdrop-blur-xl border border-white/80 rounded-3xl p-5 sm:p-8 shadow-xl"
         >
-          <h2 className="text-2xl font-bold text-gray-800 mb-8 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-2">
             <Star className="text-yellow-500 fill-yellow-400" /> Guest Reviews
             {reviewCount > 0 && (
               <span className="text-sm font-normal text-gray-500">({reviewCount})</span>
@@ -495,12 +536,12 @@ export default function RoomDetailContent({
               <p>No reviews yet. Be the first to share your experience!</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-5">
               {reviews.map((rev) => (
                 <motion.div
                   key={rev._id}
                   whileHover={{ y: -3 }}
-                  className="bg-white/70 backdrop-blur-sm border border-white/60 rounded-2xl p-5 shadow-sm"
+                  className="bg-white/70 backdrop-blur-sm border border-white/60 rounded-2xl p-4 sm:p-5 shadow-sm"
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-sm">
@@ -536,7 +577,7 @@ export default function RoomDetailContent({
             </div>
           )}
 
-          <div className="mt-10">
+          <div className="mt-8 sm:mt-10">
             <ReviewForm roomId={room._id} />
           </div>
         </motion.div>
@@ -557,20 +598,55 @@ export default function RoomDetailContent({
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
               transition={{ type: "spring", damping: 25 }}
-              className="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center"
+              className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <img
-                src={galleryImages[selectedImage]}
-                alt={room.name}
-                className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg"
-              />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedImage}
+                  src={galleryImages[selectedImage]}
+                  alt={room.name}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg"
+                />
+              </AnimatePresence>
+
+              {/* Left/Right arrow buttons inside lightbox */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevImage();
+                }}
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full p-2 sm:p-3 text-white transition z-10"
+                aria-label="Previous image"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextImage();
+                }}
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full p-2 sm:p-3 text-white transition z-10"
+                aria-label="Next image"
+              >
+                <ChevronRight size={24} />
+              </button>
+
               <button
                 onClick={() => setLightboxOpen(false)}
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full p-2 text-white transition"
               >
                 <X size={24} />
               </button>
+
+              {/* Image counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white text-sm px-4 py-1.5 rounded-full">
+                {selectedImage + 1} / {galleryImages.length}
+              </div>
             </motion.div>
           </motion.div>
         )}
